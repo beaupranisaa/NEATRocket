@@ -7,7 +7,7 @@ A rocket controller using NEAT.
 
 ### Usage:
 
-test.py:
+#### test.py:
 
 Dependencies:
 
