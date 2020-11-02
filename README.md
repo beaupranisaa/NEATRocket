@@ -27,3 +27,13 @@ python3 neat.py # to let the NN play the game
 Use the up arrow key for the main thrust.
 Use the left and right arrow keys for the side boosters. 
 
+### Fitness Function
+
+### Fitness Function
+
+Every generation will have 10secs to reach the desired state. 
+
+- summation of L^2 distance between current state and desired state across time
+    - when rocket leaves the screen we set the current state at the position the object left, and multiply the remaining time with the exit position
+- fitness criterion = min
+- fitness threshold = ? 
