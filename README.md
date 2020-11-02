@@ -27,18 +27,22 @@ python3 neat.py # to let the NN play the game
 Use the up arrow key for the main thrust.
 Use the left and right arrow keys for the side boosters. 
 
-### Fitness Function
+### NEAT Setup
 
 Every generation will have 10secs to reach the desired state. 
 
-- States:
-    - x_error = current x position - desired x position
-    - y_error = current y position - desired y position
-    - a_error = current angular position - desired angular position
-    - vx_error = current x velocity - desired x velocity
-    - vy_error = current y velocity - desired y velocity
-    - va_error = current angular velocity - desired angular velocity
-- summation of L^2 distance between current state and desired state across time
-    - when rocket leaves the screen we set the current state at the position the object left, and multiply the remaining time with the exit position
+- States/Input:
+    - x error = current x position - desired x position
+    - y error = current y position - desired y position
+    - a error = current angular position - desired angular position
+    - vx error = current x velocity - desired x velocity
+    - vy error = current y velocity - desired y velocity
+    - va error = current angular velocity - desired angular velocity
+- Output:
+    - longitudinal thrust states: [0,+1]
+    - top lateral booster states: [-1,+1]
+    - bottom lateral booster states: [-1,+1]
+- fitness function : Summation of L2 norm of the states across time
+    - When rocket leaves the screen we set the current state to the position the object left, and multiply the remaining time with the exit position to get the fitness function
 - fitness criterion = min
 - fitness threshold = ? 
