@@ -1,4 +1,5 @@
 import pymunk
+import random
 
 class Rocket:
     def __init__(self, mass = 1, height = 200, aspect_ratio = 0.12, friction = 0.3, elasticity = 0.2, x_pos= 0, y_pos = 0):
@@ -18,7 +19,7 @@ class Rocket:
         self.body.position = x_pos, y_pos
         self.body.angle = 0.01
         self.body.velocity = 0.0,0.0
-        self.body.angular_velocity = 0.0
+        self.body.angular_velocity = random.uniform(-0.1,0.1)
 
     def insert(self,space):
         space.add(self.body, self.shape)
