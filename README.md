@@ -31,13 +31,13 @@ Use the left and right arrow keys for the side boosters.
 
 Every generation will have 10secs to reach the desired state. 
 
-- state
-    - x_error
-    - y_error
-    - theta_error
-    - vx_error
-    - vy_error
-    - vt_error
+- States:
+    - x_error = current x position - desired x position
+    - y_error = current y position - desired y position
+    - a_error = current angular position - desired angular position
+    - vx_error = current x velocity - desired x velocity
+    - vy_error = current y velocity - desired y velocity
+    - va_error = current angular velocity - desired angular velocity
 - summation of L^2 distance between current state and desired state across time
     - when rocket leaves the screen we set the current state at the position the object left, and multiply the remaining time with the exit position
 - fitness criterion = min
