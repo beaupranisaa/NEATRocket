@@ -76,8 +76,8 @@ def update(dt):
         rocket.append(Rocket(x_pos = window.width//2, y_pos = window.height//2))
         rocket[-1].insert(space)
             
-    space.step(dt)
+    space.step(1/60)
 
 #Set pyglet update interval
-pyglet.clock.schedule_interval(update,1.0/120)
+pyglet.clock.schedule(update)
 pyglet.app.run()
