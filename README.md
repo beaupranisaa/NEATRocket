@@ -16,8 +16,8 @@ Dependencies:
 2. pyglet
 
 ```python
-python3 manual.py #
-python3 neat.py
+python3 manual.py # to manually play the game
+python3 neat.py # to let the NN play the game
 ```
 
 Use the up arrow key for the main thrust.

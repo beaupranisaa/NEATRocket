@@ -62,9 +62,6 @@ rocket.append(Rocket())
 
 base = Base()
 
-keyboard = pyglet.window.key.KeyStateHandler()
-window.push_handlers(keyboard)
-
 #on_draw window event
 @window.event
 def on_draw():
@@ -77,17 +74,6 @@ def on_mouse_press(x,y,button,modifier):
     pass
 
 def update(dt):
-    if(keyboard[pyglet.window.key.W] or keyboard[pyglet.window.key.UP]):
-        rocket[0].body.apply_force_at_local_point((0,1500),(0,-rocket[0].height//2))
-    if(keyboard[pyglet.window.key.E] or keyboard[pyglet.window.key.RIGHT]):
-        rocket[0].body.apply_force_at_local_point((100,0),(0,rocket[0].height//2))
-    if(keyboard[pyglet.window.key.Q] or keyboard[pyglet.window.key.LEFT]):
-        rocket[0].body.apply_force_at_local_point((-100,0),(0,rocket[0].height//2))
-    if(keyboard[pyglet.window.key.A]):
-        rocket[0].body.apply_force_at_local_point((-100,0),(0,-rocket[0].height//2))
-    if(keyboard[pyglet.window.key.D]):
-        rocket[0].body.apply_force_at_local_point((100,0),(0,-rocket[0].height//2))
-
     if rocket[0].body.position.y < -100:
         rocket[0].remove(space)
         del rocket[0] 
