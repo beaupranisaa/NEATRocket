@@ -14,6 +14,7 @@ Dependencies:
 
 1. pymunk
 2. pyglet
+3. neat-python
 
 ```python
 python3 manual.py # to manually play the game

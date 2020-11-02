@@ -4,7 +4,9 @@ import numpy as np
 import pymunk
 import pyglet
 from pymunk.pyglet_util import DrawOptions
+
 from rocket import Rocket
+from base import Base
 
 #setup the window
 window_width = 1366
@@ -20,28 +22,20 @@ options = DrawOptions()
 space = pymunk.Space()
 space.gravity = (0,-1000)
 
-#Create Base class
-class Base:
-    def __init__(self, height = 200, aspect_ratio = 0.12):
-        # set base body and shape
-        self.body = pymunk.Body(body_type=pymunk.Body.STATIC)
-        self.height = height
-        self.aspect_ratio = aspect_ratio
-        self.diameter = int(self.height*self.aspect_ratio)
-        self.shape = pymunk.Poly.create_box(self.body,size=(self.diameter,self.height))
+#insert base
+BASE_MARGIN = 100
+NOT_BASE_MARGIN = 500
+base = Base()
+base.random_position([BASE_MARGIN,window_width-BASE_MARGIN],
+        [BASE_MARGIN,window_height-BASE_MARGIN],
+        [window_width//2-NOT_BASE_MARGIN//2,window_width//2+NOT_BASE_MARGIN//2],
+        [window_height//2-NOT_BASE_MARGIN//2,window_height//2+NOT_BASE_MARGIN//2])
+base.insert(space)
 
-        # set base's position
-        self.body.position = 600,100
-        space.add(self.body,self.shape)
-
-        # set sensor = True to not handle collisions
-        self.shape.sensor = True
-
+#insert rocket
 rocket = []
 rocket.append(Rocket(x_pos = window.width//2, y_pos = window.height//2))
 rocket[-1].insert(space)
-
-base = Base()
 
 keyboard = pyglet.window.key.KeyStateHandler()
 window.push_handlers(keyboard)
@@ -69,9 +63,16 @@ def update(dt):
     if(keyboard[pyglet.window.key.D]):
         rocket[0].body.apply_force_at_local_point((100,0),(0,-rocket[0].height//2))
 
-    if rocket[0].body.position.y < -100:
+    if ((rocket[0].body.position.y < -100) or 
+            (rocket[0].body.position.y > window_height+100) or
+            (rocket[0].body.position.x < -100) or
+            (rocket[0].body.position.x > window_width+100)):
         rocket[0].remove(space)
         del rocket[0] 
+        base.random_position([BASE_MARGIN,window_width-BASE_MARGIN],
+                [BASE_MARGIN,window_height-BASE_MARGIN],
+                [window_width//2-NOT_BASE_MARGIN//2,window_width//2+NOT_BASE_MARGIN//2],
+                [window_height//2-NOT_BASE_MARGIN//2,window_height//2+NOT_BASE_MARGIN//2])
         rocket.append(Rocket(x_pos = window.width//2, y_pos = window.height//2))
         rocket[-1].insert(space)
             
