@@ -3,8 +3,8 @@ A rocket controller using NEAT.
 
 ### TODO:
 
-[x] Convert the rockets into objects
-[x] Change base to static shape object
+ - [x] Convert the rockets into objects
+ - [x] Change base to static shape object
 
 ### Usage:
 
