@@ -9,11 +9,17 @@ import os
 import random
 import pickle
 import glob
+import sys
 
 from rocket import Rocket
 from base import Base
 
-NETWORK_DIR = 'networksTest/'
+if len(sys.argv) == 2:
+    NETWORK_DIR = sys.argv[1]
+elif len(sys.argv) > 2:
+    raise "Too many directories to write to"
+else:
+    NETWORK_DIR = 'networksTest/'
 
 #setup the window
 window_width = 1366

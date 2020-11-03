@@ -10,11 +10,19 @@ import random
 import pickle
 import errno
 import glob
+import sys
 
 from rocket import Rocket
 from base import Base
 
-NETWORK_DIR = ['networks2/']
+if len(sys.argv) > 1:
+    NETWORK_DIR = [str(path) for i,path in enumerate(sys.argv) if i > 0]
+else:
+    NETWORK_DIR = ['networksTest/']
+
+print(NETWORK_DIR)
+
+#NETWORK_DIR = ['networks2/','networks4/']
 
 #setup the window
 window_width = 1366

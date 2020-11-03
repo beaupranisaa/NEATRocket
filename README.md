@@ -19,13 +19,19 @@ python3 manual.py
 - Train the network
 
 ```python
-python3 train.py
+python3 train.py <name of the directory to save the neural networks to (optional)>
+
+#Example
+python3 train.py networks/
 ```
 
 - Automatic rocket control
 
 ```python
-python3 auto.py
+python3 auto.py <name of the directory/directories with saved neural networks (optional)> 
+
+# Example:
+python3 auto.py networks/ networks2/
 ```
 
 ### NEAT Setup

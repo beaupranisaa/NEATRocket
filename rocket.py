@@ -39,7 +39,7 @@ class Rocket:
         upper_lateral_force += output[1]*self.LATERAL_FORCE
 
         if len(output) == 3:
-            lower_lateral_force += output[2]*self.LATERAL_FORCE
+            lower_lateral_force -= output[2]*self.LATERAL_FORCE
 
         self.body.apply_force_at_local_point((0,longitudinal_force),(0,-self.height//2))
         self.body.apply_force_at_local_point((lower_lateral_force,0),(0,-self.height//2)) 
