@@ -14,6 +14,8 @@ class Rocket:
         self.friction = friction
         self.elasticity = elasticity
 
+        self.LONGITUDINAL_FORCE = 2500
+        self.LATERAL_FORCE = 200.0
 
         # set rocket's  initial position
         self.body.position = x_pos, y_pos
@@ -27,3 +29,18 @@ class Rocket:
     def remove(self,space):
         space.remove(self.body, self.shape)
 
+    def propel(self, output):
+        #output is a list of output states [longitudinal, upper lateral, lower lateral]
+        upper_lateral_force = 0.0
+        lower_lateral_force = 0.0
+        longitudinal_force = 0.0
+
+        longitudinal_force += max(0,output[0])*self.LONGITUDINAL_FORCE
+        upper_lateral_force += output[1]*self.LATERAL_FORCE
+
+        if len(output) == 3:
+            lower_lateral_force += output[2]*self.LATERAL_FORCE
+
+        self.body.apply_force_at_local_point((0,longitudinal_force),(0,-self.height//2))
+        self.body.apply_force_at_local_point((lower_lateral_force,0),(0,-self.height//2)) 
+        self.body.apply_force_at_local_point((upper_lateral_force,0),(0,self.height//2))

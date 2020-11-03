@@ -13,15 +13,18 @@ import glob
 from rocket import Rocket
 from base import Base
 
-NETWORK_DIR = 'networks3/'
+NETWORK_DIR = 'networksTest/'
 
 #setup the window
 window_width = 1366
 window_height = 768
 #window = pyglet.window.Window(window_width,window_height)
 window = pyglet.window.Window(fullscreen = True)
+window_width = window.width
+window_height = window.height
 window.set_caption("NEATLanding")
 fps_display = pyglet.window.FPSDisplay(window=window)
+
 
 #create drawoptions object
 options = DrawOptions()
@@ -39,6 +42,15 @@ base.insert(space)
 #state scale
 CARTESIAN_SCALE = 200.0
 ANGULAR_SCALE = 1.0/2.0
+
+#global variables for simulation and training
+genomess = []
+nets = []
+rockets = []
+step_count = 0
+dead_rockets = []
+generation = 0
+best_fitness = -float('inf')
 
 #on_draw window event
 @window.event
@@ -86,47 +98,7 @@ def get_fitness2(states):
     s = 0
     for i, (state,state_weights) in enumerate(zip(states,state_weights)):
         s += state_weights*(abs(state))
-#        if(s > 0.2):
-#            s += 10
     return s
-
-def propel_rocket(rocket, output):
-    #output is a list of output states [longitudinal, upper lateral, lower lateral]
-    #longitudinal thruster
-    if output[0] > 0:
-        rocket.body.apply_force_at_local_point((0,output[0]*2500),(0,-rocket.height//2))
-
-    upper_lateral_force = 0.0
-    lower_lateral_force = 0.0
-
-    LATERAL_FORCE = 500.0
-
-    #upper thruster
-    if output[1] > 0:
-        upper_lateral_force += output[1]*LATERAL_FORCE
-        #lower_lateral_force += output[1]*LATERAL_FORCE
-    elif output[1] < 0:
-        upper_lateral_force -= -output[1]*LATERAL_FORCE
-        #lower_lateral_force -= -output[1]*LATERAL_FORCE
-
-    #lower thruster
-    if output[2] > 0:
-        #upper_lateral_force += output[2]*LATERAL_FORCE
-        lower_lateral_force -= output[2]*LATERAL_FORCE
-    elif output[2] < 0:
-        #upper_lateral_force -= -output[2]*LATERAL_FORCE
-        lower_lateral_force += -output[2]*LATERAL_FORCE
-
-    rocket.body.apply_force_at_local_point((upper_lateral_force,0),(0,rocket.height//2))
-    rocket.body.apply_force_at_local_point((lower_lateral_force,0),(0,-rocket.height//2)) 
-
-genomess = []
-nets = []
-rockets = []
-step_count = 0
-dead_rockets = []
-generation = 0
-best_fitness = -float('inf')
 
 def eval_genomes(genomes, config):
     #this function runs once a generation
@@ -156,6 +128,7 @@ def eval_genomes(genomes, config):
             [BASE_MARGIN,window_height-BASE_MARGIN],
             [window_width//2-NOT_BASE_MARGIN//2,window_width//2+NOT_BASE_MARGIN//2],
             [window_height//2-NOT_BASE_MARGIN//2,window_height//2+NOT_BASE_MARGIN//2])
+
 def update(dt):
     global nets
     global step_count
@@ -195,9 +168,6 @@ def update(dt):
                 [window_width//2-NOT_BASE_MARGIN//2,window_width//2+NOT_BASE_MARGIN//2],
                 [window_height//2-NOT_BASE_MARGIN//2,window_height//2+NOT_BASE_MARGIN//2])
 
-        #print(genomess[i].fitness)
-        #print(output)
-
     # apply force to every rocket
     for i, net in enumerate(nets):
         states = get_states(rockets[i])
@@ -207,7 +177,7 @@ def update(dt):
         for value in output:
             output_fitness += value**2
         genomess[i].fitness = genomess[i].fitness - get_fitness2(states)
-        propel_rocket(rockets[i],output)
+        rockets[i].propel(output)
 
         if ((rockets[i].body.position.y < -100) or 
                 (rockets[i].body.position.y > window_height+100) or
@@ -216,6 +186,7 @@ def update(dt):
             dead_rockets[i] = 1
             #rockets[i].remove(space)
             #genomess[i].fitness = genomess[i].fitness - 10
+
     space.step(1.0/60.0)
 
 
@@ -232,7 +203,6 @@ def run(config_file):
     p.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
-    p.add_reporter(neat.Checkpointer(5))
 
     # Run for up to 300 generations.
     winner = p.run(eval_genomes, 3000)

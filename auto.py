@@ -14,14 +14,18 @@ import glob
 from rocket import Rocket
 from base import Base
 
-NETWORK_DIR = 'networks3/'
+NETWORK_DIR = ['networks2/']
 
 #setup the window
 window_width = 1366
 window_height = 768
-window = pyglet.window.Window(window_width,window_height)
+#window = pyglet.window.Window(window_width,window_height)
+window = pyglet.window.Window(fullscreen=True)
+window_width = window.width
+window_height = window.height
 window.set_caption("NEATLanding")
 fps_display = pyglet.window.FPSDisplay(window=window)
+
 
 #create drawoptions object
 options = DrawOptions()
@@ -54,10 +58,6 @@ def on_draw():
 @window.event
 def on_mouse_press(x,y,button,modifier):
     base.move(x,y)
-#    base.random_position([BASE_MARGIN,window_width-BASE_MARGIN],
-#            [BASE_MARGIN,window_height-BASE_MARGIN],
-#            [window_width//2-NOT_BASE_MARGIN//2,window_width//2+NOT_BASE_MARGIN//2],
-#            [window_height//2-NOT_BASE_MARGIN//2,window_height//2+NOT_BASE_MARGIN//2])
 
 def get_states(rocket):
     #get rocket's current position and velocity
@@ -82,36 +82,6 @@ def get_states(rocket):
 
     return [ex,ey,ea,evx,evy,eva]
 
-def propel_rocket(rocket, output):
-    #output is a list of output states [longitudinal, upper lateral, lower lateral]
-    #longitudinal thruster
-    if output[0] > 0:
-        rocket.body.apply_force_at_local_point((0,output[0]*2500),(0,-rocket.height//2))
-
-    upper_lateral_force = 0.0
-    lower_lateral_force = 0.0
-
-    LATERAL_FORCE = 500.0
-
-    #upper thruster
-    if output[1] > 0:
-        upper_lateral_force += output[1]*LATERAL_FORCE
-        #lower_lateral_force += output[1]*LATERAL_FORCE
-    elif output[1] < 0:
-        upper_lateral_force -= -output[1]*LATERAL_FORCE
-        #lower_lateral_force -= -output[1]*LATERAL_FORCE
-
-    #lower thruster
-    if output[2] > 0:
-        #upper_lateral_force += output[2]*LATERAL_FORCE
-        lower_lateral_force -= output[2]*LATERAL_FORCE
-    elif output[2] < 0:
-        #upper_lateral_force -= -output[2]*LATERAL_FORCE
-        lower_lateral_force += -output[2]*LATERAL_FORCE
-
-    rocket.body.apply_force_at_local_point((upper_lateral_force,0),(0,rocket.height//2))
-    rocket.body.apply_force_at_local_point((lower_lateral_force,0),(0,-rocket.height//2)) 
-
 step_count = 0
 
 def update(dt):
@@ -134,7 +104,7 @@ def update(dt):
         states = get_states(rocket)
         output = nets[i].activate(states)
         
-        propel_rocket(rocket,output)
+        rocket.propel(output)
 
         if ((rocket.body.position.y < -400) or 
                 (rocket.body.position.y > window_height+400) or
@@ -156,29 +126,30 @@ def update(dt):
 
 nets = []
 rockets = []
+net_paths = []
 
 def run():
     global nets
     global rockets
 
-    net_paths = glob.glob(f"{NETWORK_DIR}Net*")
-    if (len(net_paths) == 0):
-        raise FileNotFoundError("No Networks found")
+    for directories in NETWORK_DIR:
+        net_paths.extend(glob.glob(f"{directories}Net*"))
+        if (len(net_paths) == 0):
+            raise FileNotFoundError("No Networks found")
 
-    for net in net_paths:
-        nets.append(pickle.load( open(net, "rb" )))
+        for net in net_paths:
+            nets.append(pickle.load( open(net, "rb" )))
 
-        rockets.append(Rocket(x_pos = window.width//2, y_pos = window.height//2))
-        rockets[-1].shape.color = (random.randint(0,255), random.randint(0,255), random.randint(0,255), 255)
-        rockets[-1].shape.sensor = True
-        rockets[-1].insert(space)
+            rockets.append(Rocket(x_pos = window.width//2, y_pos = window.height//2))
+            rockets[-1].shape.color = (random.randint(0,255), random.randint(0,255), random.randint(0,255), 255)
+            rockets[-1].shape.sensor = True
+            rockets[-1].insert(space)
+
+        if not os.path.exists(os.path.dirname(directories)):
+            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), directories)
 
     pyglet.app.run()
 
 #Set pyglet update interval
 pyglet.clock.schedule(update)
-
-if not os.path.exists(os.path.dirname(NETWORK_DIR)):
-    raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), NETWORK_DIR)
-
 run()
