@@ -28,10 +28,15 @@ python3 train.py networks/
 - Automatic rocket control
 
 ```python
-python3 auto.py <name of the directory/directories with saved neural networks (optional)> 
+python3 auto.py <neural network files (optional)> 
 
 # Example:
-python3 auto.py networks/ networks2/
+python3 auto.py networks/* networks2/Net_0.p
+```
+- Remove all networks
+
+```shell
+bash clear.sh
 ```
 
 ### NEAT Setup

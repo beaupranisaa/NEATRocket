@@ -16,13 +16,11 @@ from rocket import Rocket
 from base import Base
 
 if len(sys.argv) > 1:
-    NETWORK_DIR = [str(path) for i,path in enumerate(sys.argv) if i > 0]
+    NETWORK_PATH = [str(path) for i,path in enumerate(sys.argv) if i > 0]
 else:
-    NETWORK_DIR = ['networksTest/']
+    NETWORK_PATH = ['networksTest/*']
 
-print(NETWORK_DIR)
-
-#NETWORK_DIR = ['networks2/','networks4/']
+print("Networks:",NETWORK_PATH)
 
 #setup the window
 window_width = 1366
@@ -140,21 +138,20 @@ def run():
     global nets
     global rockets
 
-    for directories in NETWORK_DIR:
-        net_paths.extend(glob.glob(f"{directories}Net*"))
-        if (len(net_paths) == 0):
+    for path in NETWORK_PATH:
+
+        if (len(path) == 0):
             raise FileNotFoundError("No Networks found")
 
-        for net in net_paths:
-            nets.append(pickle.load( open(net, "rb" )))
+        nets.append(pickle.load( open(path, "rb" )))
 
-            rockets.append(Rocket(x_pos = window.width//2, y_pos = window.height//2))
-            rockets[-1].shape.color = (random.randint(0,255), random.randint(0,255), random.randint(0,255), 255)
-            rockets[-1].shape.sensor = True
-            rockets[-1].insert(space)
+        rockets.append(Rocket(x_pos = window.width//2, y_pos = window.height//2))
+        rockets[-1].shape.color = (random.randint(0,255), random.randint(0,255), random.randint(0,255), 255)
+        rockets[-1].shape.sensor = True
+        rockets[-1].insert(space)
 
-        if not os.path.exists(os.path.dirname(directories)):
-            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), directories)
+        if not os.path.exists(os.path.dirname(path)):
+            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), path)
 
     pyglet.app.run()
 

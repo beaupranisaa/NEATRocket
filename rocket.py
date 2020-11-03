@@ -2,7 +2,7 @@ import pymunk
 import random
 
 class Rocket:
-    def __init__(self, mass = 1, height = 200, aspect_ratio = 0.12, friction = 0.3, elasticity = 0.2, x_pos= 0, y_pos = 0):
+    def __init__(self, mass = 1, height = 200, aspect_ratio = 0.12, friction = 0.3, elasticity = 0.2, x_pos= 0, y_pos = 0, longitudinal_force = 2500, lateral_force = 200):
         # set rocket's pysical properties
         self.mass = mass
         self.aspect_ratio = aspect_ratio
@@ -14,8 +14,8 @@ class Rocket:
         self.friction = friction
         self.elasticity = elasticity
 
-        self.LONGITUDINAL_FORCE = 2500
-        self.LATERAL_FORCE = 200.0
+        self.LONGITUDINAL_FORCE = longitudinal_force
+        self.LATERAL_FORCE = lateral_force
 
         # set rocket's  initial position
         self.body.position = x_pos, y_pos

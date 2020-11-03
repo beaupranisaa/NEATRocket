@@ -120,7 +120,7 @@ def eval_genomes(genomes, config):
     for i, (genome_id, genome) in enumerate(genomes):
         genomess.append(genome)
         genomess[-1].fitness = 0
-        rockets.append(Rocket(x_pos = window.width//2, y_pos = window.height//2))
+        rockets.append(Rocket(x_pos = window.width//2, y_pos = window.height//2, lateral_force = 1000))
         rockets[-1].shape.color = (random.randint(100,255), random.randint(100,255), random.randint(100,255), 100.0)
         rockets[-1].shape.sensor = True
 
