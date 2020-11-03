@@ -8,6 +8,7 @@ import neat
 import os
 import random
 import pickle
+import glob
 
 from rocket import Rocket
 from base import Base
@@ -72,12 +73,18 @@ def get_states(rocket):
 
     return [ex,ey,ea,evx,evy,eva]
 
-def get_l2_norm(states):
+def get_fitness(states):
+    state_weights = [10,1,1,0,0,0]
     s = 0
-    for i, state in enumerate(states):
-        if(i == 3):
-            break
-        s += state**2
+    for i, (state,state_weights) in enumerate(zip(states,state_weights)):
+        s += state_weights*(state**2)
+    return s
+
+def get_fitness2(states):
+    state_weights = [3,1,1]
+    s = 0
+    for i, state_weights in enumerate(state_weights):
+        s += -state_weights*(states[i+3]/(states[i]+0.01))
     return s
 
 def propel_rocket(rocket, output):
@@ -134,7 +141,7 @@ def eval_genomes(genomes, config):
         genomess.append(genome)
         genomess[-1].fitness = 0
         rockets.append(Rocket(x_pos = window.width//2, y_pos = window.height//2))
-        rockets[-1].shape.color = (random.randint(0,255), random.randint(0,255), random.randint(0,255), 255)
+        rockets[-1].shape.color = (random.randint(0,255), 20 , random.randint(0,255), 255)
         rockets[-1].shape.sensor = True
 
         rockets[-1].insert(space)
@@ -162,14 +169,13 @@ def update(dt):
         best_fitness_idx = -1
         for i,genome in enumerate(genomess):
             genome.fitness -= (60*20-step_count)
-            print(best_fitness,genome.fitness)
             if best_fitness < genome.fitness:
                 best_fitness = genome.fitness
                 best_fitness_idx = i
         
         if best_fitness_idx != -1:
             print("Saving Network")
-            pickle.dump(nets[best_fitness_idx],open(f"{NETWORK_DIR}/Net{generation}.p","wb"))
+            pickle.dump(nets[best_fitness_idx],open(f"{NETWORK_DIR}/Net_{generation}.p","wb"))
 
         for rocket in rockets:
             rocket.remove(space)
@@ -198,7 +204,7 @@ def update(dt):
         
         for value in output:
             output_fitness += value**2
-        genomess[i].fitness = genomess[i].fitness - get_l2_norm(states)
+        genomess[i].fitness = genomess[i].fitness - get_fitness(states)
         propel_rocket(rockets[i],output)
 
         if ((rockets[i].body.position.y < -100) or 
@@ -232,7 +238,6 @@ def run(config_file):
     # Display the winning genome.
     print('\nBest genome:\n{!s}'.format(winner))
 
-
 #Set pyglet update interval
 pyglet.clock.schedule(update)
 
@@ -241,34 +246,9 @@ config_path = os.path.join(local_dir, 'config')
 
 if not os.path.exists(os.path.dirname(NETWORK_DIR)):
     os.makedirs(os.path.dirname(NETWORK_DIR))
+else:
+    net_paths = glob.glob(f"{NETWORK_DIR}Net*")
+    for paths in net_paths:
+        os.remove(paths)
 
 run(config_path)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

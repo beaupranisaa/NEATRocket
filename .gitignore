@@ -3,4 +3,4 @@
 *.csv
 *.gv
 *.svg
-
+*networks/

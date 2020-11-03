@@ -1,28 +1,19 @@
-# NEATLanding
+# NEATRocket
 A rocket controller using NEAT.
-
-### TODO:
-
-- [x] Convert the rockets into objects
-- [x] Change base to static shape object
-- [x] Create a fitness funtion
-- [x] Create a configuration file
 
 ### Dependencies:
 
-1. pymunk
-2. pyglet
-3. neat-python
+1. pymunk 5.7.0
+2. pyglet 1.5.7
+3. neat-python 0.92
 
 ### Usage:
 
 ```python
 python3 manual.py # to manually play the game
 python3 train.py # to train the NN
+python3 auto.py # to run the trained NNs
 ```
-
-Use the up arrow key for the main thrust.
-Use the left and right arrow keys for the side boosters. 
 
 ### NEAT Setup
 
@@ -37,8 +28,6 @@ Use the left and right arrow keys for the side boosters.
     - longitudinal thrust states: [-1,+1]
     - top lateral booster states: [-1,+1]
     - bottom lateral booster states: [-1,+1]
-- fitness function : Summation of L2 norm of the states across time
+- fitness function : Summation of weighted squared errors of states across time
     - Every generation will have 10secs to reach the desired state. 
     - When rocket leaves the screen we set the current state to the position the object left, and multiply the remaining time with the exit position to get the fitness function
-- fitness criterion = min
-- fitness threshold = ? 
