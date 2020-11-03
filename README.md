@@ -12,31 +12,31 @@ Training a rocket controller using the NEAT algorithm.
 
 - Manually control the rocket with your arrow keys.
 
-```python
-python3 manual.py
+```shell
+$ python3 manual.py
 ```
 
 - Train the network
 
-```python
-python3 train.py <name of the directory to save the neural networks to (optional)>
+```shell
+$ python3 train.py <name of the directory to save the neural networks to (optional)>
 
 #Example
-python3 train.py networks/
+$ python3 train.py networks/
 ```
 
 - Automatic rocket control
 
-```python
-python3 auto.py <neural network files (optional)> 
+```shell
+$ python3 auto.py <neural network files (optional)> 
 
 # Example:
-python3 auto.py networks/* networks2/Net_0.p
+$ python3 auto.py networks/* networks2/Net_0.p
 ```
 - Remove all networks
 
 ```shell
-bash clear.sh
+$ bash clear.sh
 ```
 
 ### NEAT Setup
