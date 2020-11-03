@@ -6,9 +6,13 @@ import pyglet
 from pymunk.pyglet_util import DrawOptions
 import neat
 import os
+import random
+import pickle
 
 from rocket import Rocket
 from base import Base
+
+NETWORK_DIR = 'networks/'
 
 #setup the window
 window_width = 1366
@@ -49,10 +53,10 @@ def get_states(rocket):
     #get rocket's current position and velocity
     x = float(rocket.body.position[0])/window_width
     y = float(rocket.body.position[1])/window_height
-    a = float(rocket.body.angle)/3.1614
+    a = float(rocket.body.angle)
     vx = float(rocket.body.velocity[0])/window_width
     vy = float(rocket.body.velocity[1])/window_height
-    va = float(rocket.body.angular_velocity)/3.1614
+    va = float(rocket.body.angular_velocity)
 
     #get base position
     bx = float(base.body.position[0])/window_width
@@ -70,7 +74,9 @@ def get_states(rocket):
 
 def get_l2_norm(states):
     s = 0
-    for state in states:
+    for i, state in enumerate(states):
+        if(i == 3):
+            break
         s += state**2
     return s
 
@@ -78,35 +84,40 @@ def propel_rocket(rocket, output):
     #output is a list of output states [longitudinal, upper lateral, lower lateral]
     #longitudinal thruster
     if output[0] > 0:
-        rocket.body.apply_force_at_local_point((0,output[0]*1500),(0,-rocket.height//2))
+        rocket.body.apply_force_at_local_point((0,output[0]*2500),(0,-rocket.height//2))
 
     upper_lateral_force = 0.0
     lower_lateral_force = 0.0
 
+    LATERAL_FORCE = 500.0
+
     #upper thruster
     if output[1] > 0:
-        upper_lateral_force += output[1]*200.0
-#        lower_lateral_force += 200.0
+        upper_lateral_force += output[1]*LATERAL_FORCE
+        #lower_lateral_force += output[1]*LATERAL_FORCE
     elif output[1] < 0:
-        upper_lateral_force -= -output[1]*200.0
-        #lower_lateral_force -= 200.0
+        upper_lateral_force -= -output[1]*LATERAL_FORCE
+        #lower_lateral_force -= -output[1]*LATERAL_FORCE
 
     #lower thruster
-    if output[2] > 0:
-        #upper_lateral_force += 200.0
-        lower_lateral_force -= output[2]*200.0
-    elif output[2] < 0:
-        #upper_lateral_force -= 200.0
-        lower_lateral_force += -output[2]*200.0
+#    if output[2] > 0:
+#        upper_lateral_force += output[2]*LATERAL_FORCE
+#        lower_lateral_force -= output[2]*LATERAL_FORCE
+#    elif output[2] < 0:
+#        upper_lateral_force -= -output[2]*LATERAL_FORCE
+#        lower_lateral_force += -output[2]*LATERAL_FORCE
 
     rocket.body.apply_force_at_local_point((upper_lateral_force,0),(0,rocket.height//2))
-    rocket.body.apply_force_at_local_point((lower_lateral_force,0),(0,-rocket.height//2)) 
+    #rocket.body.apply_force_at_local_point((lower_lateral_force,0),(0,-rocket.height//2)) 
 
 genomess = []
 nets = []
 rockets = []
 step_count = 0
 dead_rockets = []
+generation = 0
+best_fitness = -float('inf')
+
 
 def eval_genomes(genomes, config):
     #this function runs once a generation
@@ -123,7 +134,9 @@ def eval_genomes(genomes, config):
         genomess.append(genome)
         genomess[-1].fitness = 0
         rockets.append(Rocket(x_pos = window.width//2, y_pos = window.height//2))
+        rockets[-1].shape.color = (random.randint(0,255), random.randint(0,255), random.randint(0,255), 255)
         rockets[-1].shape.sensor = True
+
         rockets[-1].insert(space)
         dead_rockets.append(0)
         nets.append(neat.nn.FeedForwardNetwork.create(genome, config))
@@ -141,12 +154,28 @@ def update(dt):
     global genomess
     global rockets
     global dead_rockets
+    global generation
+    global best_fitness
 
     step_count += 1
-    if(((step_count) >= 60*10) or (sum(dead_rockets) == 50)):
+    if(((step_count) >= 60*20) or (sum(dead_rockets) == 100)):
+        best_fitness_idx = -1
+        for i,genome in enumerate(genomess):
+            genome.fitness -= (60*20-step_count)
+            print(best_fitness,genome.fitness)
+            if best_fitness < genome.fitness:
+                best_fitness = genome.fitness
+                best_fitness_idx = i
+        
+        if best_fitness_idx != -1:
+            print("Saving Network")
+            pickle.dump(nets[best_fitness_idx],open(f"{NETWORK_DIR}/Net{generation}.p","wb"))
+
         for rocket in rockets:
             rocket.remove(space)
+
         pyglet.app.exit()
+        generation += 1
         nets = []
         step_count = 0
         genomess = []
@@ -156,13 +185,20 @@ def update(dt):
     for i, net in enumerate(nets):
         states = get_states(rockets[i])
         output = net.activate(states)
-        genomess[i].fitness = genomess[i].fitness - get_l2_norm(states) - 0.1*float(sum(output))
+        output_fitness = 0
 
-        if((step_count % 10 == 0) and (i == 1)):
+        if((step_count % 300 == 0) and (i == 0)):
+            base.random_position([BASE_MARGIN,window_width-BASE_MARGIN],
+                    [BASE_MARGIN,window_height-BASE_MARGIN],
+                    [window_width//2-NOT_BASE_MARGIN//2,window_width//2+NOT_BASE_MARGIN//2],
+                    [window_height//2-NOT_BASE_MARGIN//2,window_height//2+NOT_BASE_MARGIN//2])
             #print(genomess[i].fitness)
             #print(output)
             pass
         
+        for value in output:
+            output_fitness += value**2
+        genomess[i].fitness = genomess[i].fitness - get_l2_norm(states)
         propel_rocket(rockets[i],output)
 
         if ((rockets[i].body.position.y < -100) or 
@@ -171,7 +207,7 @@ def update(dt):
                 (rockets[i].body.position.x > window_width+100)):
             dead_rockets[i] = 1
             #rockets[i].remove(space)
-            genomess[i].fitness = genomess[i].fitness - 10
+            #genomess[i].fitness = genomess[i].fitness - 10
     space.step(1.0/60.0)
 
 
@@ -202,6 +238,10 @@ pyglet.clock.schedule(update)
 
 local_dir = os.path.dirname(__file__)
 config_path = os.path.join(local_dir, 'config')
+
+if not os.path.exists(os.path.dirname(NETWORK_DIR)):
+    os.makedirs(os.path.dirname(NETWORK_DIR))
+
 run(config_path)
 
 
