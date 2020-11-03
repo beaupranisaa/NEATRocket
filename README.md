@@ -48,3 +48,9 @@ python3 auto.py networks/ networks2/
     - top lateral booster states: clamped [-1,+1]
     - bottom lateral booster states: clamped [-1,+1]
 - *fitness function* : Summation of weighted squared errors of the positional states across time
+
+### Todo:
+
+1. Add text and visualizations
+2. Make it easy to spot the best genome in a generation
+
