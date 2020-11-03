@@ -43,6 +43,9 @@ class Base:
         #print(x_pos,y_pos)
         self.body.position = x_pos, y_pos
 
+    def move(self, x,y):
+        self.body.position = x, y
+
 
 
 

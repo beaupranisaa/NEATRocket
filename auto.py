@@ -14,7 +14,7 @@ import glob
 from rocket import Rocket
 from base import Base
 
-NETWORK_DIR = 'networks/'
+NETWORK_DIR = 'networks3/'
 
 #setup the window
 window_width = 1366
@@ -40,6 +40,10 @@ base.random_position([BASE_MARGIN,window_width-BASE_MARGIN],
         [window_height//2-NOT_BASE_MARGIN//2,window_height//2+NOT_BASE_MARGIN//2])
 base.insert(space)
 
+#state scale
+CARTESIAN_SCALE = 200.0
+ANGULAR_SCALE = 1.0/2.0
+
 #on_draw window event
 @window.event
 def on_draw():
@@ -49,20 +53,24 @@ def on_draw():
 
 @window.event
 def on_mouse_press(x,y,button,modifier):
-    pass
+    base.move(x,y)
+#    base.random_position([BASE_MARGIN,window_width-BASE_MARGIN],
+#            [BASE_MARGIN,window_height-BASE_MARGIN],
+#            [window_width//2-NOT_BASE_MARGIN//2,window_width//2+NOT_BASE_MARGIN//2],
+#            [window_height//2-NOT_BASE_MARGIN//2,window_height//2+NOT_BASE_MARGIN//2])
 
 def get_states(rocket):
     #get rocket's current position and velocity
-    x = float(rocket.body.position[0])/window_width
-    y = float(rocket.body.position[1])/window_height
-    a = float(rocket.body.angle)
-    vx = float(rocket.body.velocity[0])/window_width
-    vy = float(rocket.body.velocity[1])/window_height
+    x = float(rocket.body.position[0])/CARTESIAN_SCALE
+    y = float(rocket.body.position[1])/CARTESIAN_SCALE
+    a = float(rocket.body.angle)/ANGULAR_SCALE
+    vx = float(rocket.body.velocity[0])/CARTESIAN_SCALE
+    vy = float(rocket.body.velocity[1])/CARTESIAN_SCALE
     va = float(rocket.body.angular_velocity)
 
     #get base position
-    bx = float(base.body.position[0])/window_width
-    by = float(base.body.position[1])/window_height
+    bx = float(base.body.position[0])/CARTESIAN_SCALE
+    by = float(base.body.position[1])/CARTESIAN_SCALE
 
     #calculate rocket state as mentioned in README
     ex = x-bx
@@ -73,14 +81,6 @@ def get_states(rocket):
     eva = va
 
     return [ex,ey,ea,evx,evy,eva]
-
-def get_l2_norm(states):
-    s = 0
-    for i, state in enumerate(states):
-        if(i == 3):
-            break
-        s += state**2
-    return s
 
 def propel_rocket(rocket, output):
     #output is a list of output states [longitudinal, upper lateral, lower lateral]
@@ -102,15 +102,15 @@ def propel_rocket(rocket, output):
         #lower_lateral_force -= -output[1]*LATERAL_FORCE
 
     #lower thruster
-#    if output[2] > 0:
-#        upper_lateral_force += output[2]*LATERAL_FORCE
-#        lower_lateral_force -= output[2]*LATERAL_FORCE
-#    elif output[2] < 0:
-#        upper_lateral_force -= -output[2]*LATERAL_FORCE
-#        lower_lateral_force += -output[2]*LATERAL_FORCE
+    if output[2] > 0:
+        #upper_lateral_force += output[2]*LATERAL_FORCE
+        lower_lateral_force -= output[2]*LATERAL_FORCE
+    elif output[2] < 0:
+        #upper_lateral_force -= -output[2]*LATERAL_FORCE
+        lower_lateral_force += -output[2]*LATERAL_FORCE
 
     rocket.body.apply_force_at_local_point((upper_lateral_force,0),(0,rocket.height//2))
-    #rocket.body.apply_force_at_local_point((lower_lateral_force,0),(0,-rocket.height//2)) 
+    rocket.body.apply_force_at_local_point((lower_lateral_force,0),(0,-rocket.height//2)) 
 
 step_count = 0
 
@@ -123,11 +123,11 @@ def update(dt):
 
     step_count += 1
 
-    if(step_count % 300 == 0):
-        base.random_position([BASE_MARGIN,window_width-BASE_MARGIN],
-                [BASE_MARGIN,window_height-BASE_MARGIN],
-                [window_width//2-NOT_BASE_MARGIN//2,window_width//2+NOT_BASE_MARGIN//2],
-                [window_height//2-NOT_BASE_MARGIN//2,window_height//2+NOT_BASE_MARGIN//2])
+#    if(step_count % 600 == 0):
+#        base.random_position([BASE_MARGIN,window_width-BASE_MARGIN],
+#                [BASE_MARGIN,window_height-BASE_MARGIN],
+#                [window_width//2-NOT_BASE_MARGIN//2,window_width//2+NOT_BASE_MARGIN//2],
+#                [window_height//2-NOT_BASE_MARGIN//2,window_height//2+NOT_BASE_MARGIN//2])
 
 
     for i, rocket in enumerate(rockets):
@@ -136,18 +136,21 @@ def update(dt):
         
         propel_rocket(rocket,output)
 
-        if ((rocket.body.position.y < -100) or 
-                (rocket.body.position.y > window_height+100) or
-                (rocket.body.position.x < -100) or
-                (rocket.body.position.x > window_width+100)):
-            rocket.remove(space)
+        if ((rocket.body.position.y < -400) or 
+                (rocket.body.position.y > window_height+400) or
+                (rocket.body.position.x < -400) or
+                (rocket.body.position.x > window_width+400)):
             dead_list.append(i)
 
-    for i in dead_list:
-        rockets[i] = (Rocket(x_pos = window.width//2, y_pos = window.height//2))
-        rockets[i].shape.color = (random.randint(0,255), random.randint(0,255), random.randint(0,255), 255)
-        rockets[i].shape.sensor = True
-        rockets[i].insert(space)
+#    for i in dead_list:
+#        print("removed:",i)
+#        rockets[i].remove(space)
+#        del nets[i]
+#        del rockets[i]
+    #    rockets[i] = (Rocket(x_pos = window.width//2, y_pos = window.height//2))
+    #    rockets[i].shape.color = (random.randint(0,255), random.randint(0,255), random.randint(0,255), 255)
+    #    rockets[i].shape.sensor = True
+    #    rockets[i].insert(space)
 
     space.step(1.0/60.0)
 
@@ -176,6 +179,6 @@ def run():
 pyglet.clock.schedule(update)
 
 if not os.path.exists(os.path.dirname(NETWORK_DIR)):
-    raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), filename)
+    raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), NETWORK_DIR)
 
 run()

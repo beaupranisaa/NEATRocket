@@ -13,12 +13,13 @@ import glob
 from rocket import Rocket
 from base import Base
 
-NETWORK_DIR = 'networks/'
+NETWORK_DIR = 'networks3/'
 
 #setup the window
 window_width = 1366
 window_height = 768
-window = pyglet.window.Window(window_width,window_height)
+#window = pyglet.window.Window(window_width,window_height)
+window = pyglet.window.Window(fullscreen = True)
 window.set_caption("NEATLanding")
 fps_display = pyglet.window.FPSDisplay(window=window)
 
@@ -32,12 +33,12 @@ space.gravity = (0,-1000)
 #insert base
 BASE_MARGIN = 100
 NOT_BASE_MARGIN = 500
-base = Base()
-base.random_position([BASE_MARGIN,window_width-BASE_MARGIN],
-        [BASE_MARGIN,window_height-BASE_MARGIN],
-        [window_width//2-NOT_BASE_MARGIN//2,window_width//2+NOT_BASE_MARGIN//2],
-        [window_height//2-NOT_BASE_MARGIN//2,window_height//2+NOT_BASE_MARGIN//2])
+base = Base(x_pos = window_width//2,y_pos = window_height//2)
 base.insert(space)
+
+#state scale
+CARTESIAN_SCALE = 200.0
+ANGULAR_SCALE = 1.0/2.0
 
 #on_draw window event
 @window.event
@@ -52,16 +53,16 @@ def on_mouse_press(x,y,button,modifier):
 
 def get_states(rocket):
     #get rocket's current position and velocity
-    x = float(rocket.body.position[0])/window_width
-    y = float(rocket.body.position[1])/window_height
-    a = float(rocket.body.angle)
-    vx = float(rocket.body.velocity[0])/window_width
-    vy = float(rocket.body.velocity[1])/window_height
+    x = float(rocket.body.position[0])/CARTESIAN_SCALE
+    y = float(rocket.body.position[1])/CARTESIAN_SCALE
+    a = float(rocket.body.angle)/ANGULAR_SCALE
+    vx = float(rocket.body.velocity[0])/CARTESIAN_SCALE
+    vy = float(rocket.body.velocity[1])/CARTESIAN_SCALE
     va = float(rocket.body.angular_velocity)
 
     #get base position
-    bx = float(base.body.position[0])/window_width
-    by = float(base.body.position[1])/window_height
+    bx = float(base.body.position[0])/CARTESIAN_SCALE
+    by = float(base.body.position[1])/CARTESIAN_SCALE
 
     #calculate rocket state as mentioned in README
     ex = x-bx
@@ -74,17 +75,19 @@ def get_states(rocket):
     return [ex,ey,ea,evx,evy,eva]
 
 def get_fitness(states):
-    state_weights = [10,1,1,0,0,0]
+    state_weights = [1,1,1,0,0,0]
     s = 0
     for i, (state,state_weights) in enumerate(zip(states,state_weights)):
         s += state_weights*(state**2)
     return s
 
 def get_fitness2(states):
-    state_weights = [3,1,1]
+    state_weights = [1,1,1,0,0,0]
     s = 0
-    for i, state_weights in enumerate(state_weights):
-        s += -state_weights*(states[i+3]/(states[i]+0.01))
+    for i, (state,state_weights) in enumerate(zip(states,state_weights)):
+        s += state_weights*(abs(state))
+#        if(s > 0.2):
+#            s += 10
     return s
 
 def propel_rocket(rocket, output):
@@ -107,15 +110,15 @@ def propel_rocket(rocket, output):
         #lower_lateral_force -= -output[1]*LATERAL_FORCE
 
     #lower thruster
-#    if output[2] > 0:
-#        upper_lateral_force += output[2]*LATERAL_FORCE
-#        lower_lateral_force -= output[2]*LATERAL_FORCE
-#    elif output[2] < 0:
-#        upper_lateral_force -= -output[2]*LATERAL_FORCE
-#        lower_lateral_force += -output[2]*LATERAL_FORCE
+    if output[2] > 0:
+        #upper_lateral_force += output[2]*LATERAL_FORCE
+        lower_lateral_force -= output[2]*LATERAL_FORCE
+    elif output[2] < 0:
+        #upper_lateral_force -= -output[2]*LATERAL_FORCE
+        lower_lateral_force += -output[2]*LATERAL_FORCE
 
     rocket.body.apply_force_at_local_point((upper_lateral_force,0),(0,rocket.height//2))
-    #rocket.body.apply_force_at_local_point((lower_lateral_force,0),(0,-rocket.height//2)) 
+    rocket.body.apply_force_at_local_point((lower_lateral_force,0),(0,-rocket.height//2)) 
 
 genomess = []
 nets = []
@@ -124,7 +127,6 @@ step_count = 0
 dead_rockets = []
 generation = 0
 best_fitness = -float('inf')
-
 
 def eval_genomes(genomes, config):
     #this function runs once a generation
@@ -141,20 +143,19 @@ def eval_genomes(genomes, config):
         genomess.append(genome)
         genomess[-1].fitness = 0
         rockets.append(Rocket(x_pos = window.width//2, y_pos = window.height//2))
-        rockets[-1].shape.color = (random.randint(0,255), 20 , random.randint(0,255), 255)
+        rockets[-1].shape.color = (random.randint(100,255), random.randint(100,255), random.randint(100,255), 100.0)
         rockets[-1].shape.sensor = True
 
         rockets[-1].insert(space)
         dead_rockets.append(0)
         nets.append(neat.nn.FeedForwardNetwork.create(genome, config))
 
+    pyglet.app.run()
+
     base.random_position([BASE_MARGIN,window_width-BASE_MARGIN],
             [BASE_MARGIN,window_height-BASE_MARGIN],
             [window_width//2-NOT_BASE_MARGIN//2,window_width//2+NOT_BASE_MARGIN//2],
             [window_height//2-NOT_BASE_MARGIN//2,window_height//2+NOT_BASE_MARGIN//2])
-
-    pyglet.app.run()
-
 def update(dt):
     global nets
     global step_count
@@ -167,6 +168,7 @@ def update(dt):
     step_count += 1
     if(((step_count) >= 60*20) or (sum(dead_rockets) == 100)):
         best_fitness_idx = -1
+        best_fitness = -float('inf')
         for i,genome in enumerate(genomess):
             genome.fitness -= (60*20-step_count)
             if best_fitness < genome.fitness:
@@ -187,24 +189,24 @@ def update(dt):
         genomess = []
         rockets = []
 
+    if((step_count % 300 == 0)):
+        base.random_position([BASE_MARGIN,window_width-BASE_MARGIN],
+                [BASE_MARGIN,window_height-BASE_MARGIN],
+                [window_width//2-NOT_BASE_MARGIN//2,window_width//2+NOT_BASE_MARGIN//2],
+                [window_height//2-NOT_BASE_MARGIN//2,window_height//2+NOT_BASE_MARGIN//2])
+
+        #print(genomess[i].fitness)
+        #print(output)
+
     # apply force to every rocket
     for i, net in enumerate(nets):
         states = get_states(rockets[i])
         output = net.activate(states)
         output_fitness = 0
-
-        if((step_count % 300 == 0) and (i == 0)):
-            base.random_position([BASE_MARGIN,window_width-BASE_MARGIN],
-                    [BASE_MARGIN,window_height-BASE_MARGIN],
-                    [window_width//2-NOT_BASE_MARGIN//2,window_width//2+NOT_BASE_MARGIN//2],
-                    [window_height//2-NOT_BASE_MARGIN//2,window_height//2+NOT_BASE_MARGIN//2])
-            #print(genomess[i].fitness)
-            #print(output)
-            pass
         
         for value in output:
             output_fitness += value**2
-        genomess[i].fitness = genomess[i].fitness - get_fitness(states)
+        genomess[i].fitness = genomess[i].fitness - get_fitness2(states)
         propel_rocket(rockets[i],output)
 
         if ((rockets[i].body.position.y < -100) or 
