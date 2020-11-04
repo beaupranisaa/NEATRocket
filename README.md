@@ -41,21 +41,22 @@ $ bash clear.sh
 
 ### NEAT Setup
 
-- *States/Input:*
+- **States/Input:**
     - x error = current x position - desired x position
     - y error = current y position - desired y position
     - a error = current angular position - desired angular position
     - vx error = current x velocity - desired x velocity
     - vy error = current y velocity - desired y velocity
     - va error = current angular velocity - desired angular velocity
-- *Output:*
-    - longitudinal thrust states: clamped [-1,+1]
-    - top lateral booster states: clamped [-1,+1]
-    - bottom lateral booster states: clamped [-1,+1]
-- *fitness function* : Summation of weighted squared errors of the positional states across time
+- **Output:**
+    - longitudinal propulsion states: clamped [-1,+1]
+    - top lateral propulsion states: clamped [-1,+1]
+    - bottom lateral propulsion states: clamped [-1,+1]
+- **fitness function** : Summation of weighted squared errors of the positional states across time
 
 ### Todo:
 
 1. Add text and visualizations
 2. Make it easy to spot the best genome in a generation
+3. Try having only x and y to be used for the fitness function and ignore the angle
 
