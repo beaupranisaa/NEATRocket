@@ -11,7 +11,8 @@ from base import Base
 #setup the window
 window_width = 1366
 window_height = 768
-window = pyglet.window.Window(window_width,window_height)
+#window = pyglet.window.Window(window_width,window_height)
+window = pyglet.window.Window(fullscreen=True)
 window.set_caption("NEATLanding")
 fps_display = pyglet.window.FPSDisplay(window=window)
 
@@ -47,9 +48,9 @@ def on_draw():
     space.debug_draw(options)
     fps_display.draw()
 
-@window.event
-def on_mouse_press(x,y,button,modifier):
-    pass
+#@window.event
+#def on_mouse_press(x,y,button,modifier):
+#    pass
 
 def update(dt):
     if(keyboard[pyglet.window.key.W] or keyboard[pyglet.window.key.UP]):

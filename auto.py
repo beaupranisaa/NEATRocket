@@ -32,7 +32,6 @@ window_height = window.height
 window.set_caption("NEATLanding")
 fps_display = pyglet.window.FPSDisplay(window=window)
 
-
 #create drawoptions object
 options = DrawOptions()
 
@@ -139,6 +138,8 @@ def run():
     global rockets
 
     for path in NETWORK_PATH:
+        if not os.path.exists(os.path.dirname(path)):
+            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), path)
 
         if (len(path) == 0):
             raise FileNotFoundError("No Networks found")
@@ -149,9 +150,6 @@ def run():
         rockets[-1].shape.color = (random.randint(0,255), random.randint(0,255), random.randint(0,255), 255)
         rockets[-1].shape.sensor = True
         rockets[-1].insert(space)
-
-        if not os.path.exists(os.path.dirname(path)):
-            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), path)
 
     pyglet.app.run()
 

@@ -24,13 +24,12 @@ else:
 #setup the window
 window_width = 1366
 window_height = 768
-#window = pyglet.window.Window(window_width,window_height)
-window = pyglet.window.Window(fullscreen = True)
+window = pyglet.window.Window(window_width,window_height)
+#window = pyglet.window.Window(fullscreen = True)
 window_width = window.width
 window_height = window.height
 window.set_caption("NEATLanding")
 fps_display = pyglet.window.FPSDisplay(window=window)
-
 
 #create drawoptions object
 options = DrawOptions()
@@ -125,6 +124,7 @@ def eval_genomes(genomes, config):
         rockets[-1].shape.sensor = True
 
         rockets[-1].insert(space)
+
         dead_rockets.append(0)
         nets.append(neat.nn.FeedForwardNetwork.create(genome, config))
 
@@ -145,11 +145,12 @@ def update(dt):
     global best_fitness
 
     step_count += 1
+
     if(((step_count) >= 60*20) or (sum(dead_rockets) == 100)):
         best_fitness_idx = -1
         best_fitness = -float('inf')
         for i,genome in enumerate(genomess):
-            genome.fitness -= (60*20-step_count)
+            genome.fitness -= (60*20-step_count)*5
             if best_fitness < genome.fitness:
                 best_fitness = genome.fitness
                 best_fitness_idx = i
@@ -178,10 +179,12 @@ def update(dt):
     for i, net in enumerate(nets):
         states = get_states(rockets[i])
         output = net.activate(states)
-        output_fitness = 0
-        
-        for value in output:
-            output_fitness += value**2
+
+       # output_fitness = 0
+       # 
+       # for value in output:
+       #     output_fitness += value**2
+
         genomess[i].fitness = genomess[i].fitness - get_fitness2(states)
         rockets[i].propel(output)
 
@@ -210,7 +213,7 @@ def run(config_file):
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
 
-    # Run for up to 300 generations.
+    # Run for up to 3000 generations.
     winner = p.run(eval_genomes, 3000)
 
     # Display the winning genome.

@@ -56,7 +56,17 @@ $ bash clear.sh
 
 ### Todo:
 
-1. Add text and visualizations
-2. Make it easy to spot the best genome in a generation
-3. Try having only x and y to be used for the fitness function and ignore the angle
+1. Add text and visualizations (best genome is a space shuttle, list of fitness, generation number, identification for each genome)
+2. Find better fitness functions
+    - Use only x and y position 
+3. Read the paper again.
+4. Optimize config file
+5. Record and make presentation
+    - find interesting points
+
+
+
+
+
+
 
