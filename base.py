@@ -2,7 +2,7 @@ import pymunk
 import random
 
 class Base:
-    def __init__(self, height = 200, aspect_ratio = 0.12, x_pos = 0, y_pos = 0):
+    def __init__(self, height = 200, aspect_ratio = 0.115, x_pos = 0, y_pos = 0):
         # set base body and shape
         self.body = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
         self.height = height

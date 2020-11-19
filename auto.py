@@ -18,7 +18,8 @@ from base import Base
 if len(sys.argv) > 1:
     NETWORK_PATH = [str(path) for i,path in enumerate(sys.argv) if i > 0]
 else:
-    NETWORK_PATH = ['networksTest/*']
+    default_path = glob.glob('networksTest/*')
+    NETWORK_PATH = default_path
 
 print("Networks:",NETWORK_PATH)
 
@@ -31,6 +32,8 @@ window_width = window.width
 window_height = window.height
 window.set_caption("NEATLanding")
 fps_display = pyglet.window.FPSDisplay(window=window)
+
+batch = pyglet.graphics.Batch()
 
 #create drawoptions object
 options = DrawOptions()
@@ -60,9 +63,8 @@ ANGULAR_SCALE = 1.0/2.0
 def on_draw():
     window.clear()
     space.debug_draw(options)
+    batch.draw()
     fps_display.draw()
-    for rocket_image in rocket_images:
-        rocket_image.rocket_sprite.draw()
 
 @window.event
 def on_mouse_press(x,y,button,modifier):
@@ -110,7 +112,8 @@ def update(dt):
 
 
     for i, rocket in enumerate(rockets):
-        rocket_images[i].rocket_sprite.update(rocket.body.position.x, rocket.body.position.y, -float(rocket.body.angle) * 180 / 3.1416)
+        rocket_images[i].attach(rocket)
+        rocket.update()
         states = get_states(rocket)
         output = nets[i].activate(states)
         
@@ -151,12 +154,11 @@ def run():
 
         nets.append(pickle.load( open(path, "rb" )))
 
-        rockets.append(Rocket(x_pos = window.width//2, y_pos = window.height//2))
-        rocket_images.append(RocketImage())
+        rockets.append(Rocket(x_pos = window.width//2, y_pos = window.height//2,batch=batch))
+        rocket_images.append(RocketImage(batch=batch))
 
-        rockets[-1].shape.color = (random.randint(0,255), random.randint(0,255), random.randint(0,255), 255)
-        rockets[-1].shape.sensor = True
         rockets[-1].insert(space)
+        rockets[-1].visibility(False)
         rocket_images[-1].attach(rockets[-1])
 
     pyglet.app.run()

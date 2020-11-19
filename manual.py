@@ -35,36 +35,48 @@ base.random_position([BASE_MARGIN,window_width-BASE_MARGIN],
         [window_height//2-NOT_BASE_MARGIN//2,window_height//2+NOT_BASE_MARGIN//2])
 base.insert(space)
 
+batch = pyglet.graphics.Batch()
+
 #insert rocket
 rocket = []
-rocket.append(Rocket(x_pos = window.width//2, y_pos = window.height//2))
+rocket.append(Rocket(x_pos = window.width//2, y_pos = window.height//2,lateral_force=300,batch=batch))
 rocket[-1].insert(space)
 
-rocket_image = RocketImage()
+rocket_image = RocketImage(batch = batch)
 rocket_image.attach(rocket[-1])
 
 keyboard = pyglet.window.key.KeyStateHandler()
 window.push_handlers(keyboard)
+
 
 #on_draw window event
 @window.event
 def on_draw():
     window.clear()
     space.debug_draw(options)
+    batch.draw()
     fps_display.draw()
-    rocket_image.rocket_sprite.draw()
 
 def update(dt):
+    output = [0,0,0]
+
     if(keyboard[pyglet.window.key.W] or keyboard[pyglet.window.key.UP]):
-        rocket[0].body.apply_force_at_local_point((0,1500),(0,-rocket[0].height//2))
+        output[0] += 1
+        #rocket[0].body.apply_force_at_local_point((0,1500),(0,-rocket[0].height//2))
     if(keyboard[pyglet.window.key.E] or keyboard[pyglet.window.key.RIGHT]):
-        rocket[0].body.apply_force_at_local_point((100,0),(0,rocket[0].height//2))
+        output[1] += 1
+        #rocket[0].body.apply_force_at_local_point((100,0),(0,rocket[0].height//2))
     if(keyboard[pyglet.window.key.Q] or keyboard[pyglet.window.key.LEFT]):
-        rocket[0].body.apply_force_at_local_point((-100,0),(0,rocket[0].height//2))
+        output[1] -= 1
+        #rocket[0].body.apply_force_at_local_point((-100,0),(0,rocket[0].height//2))
     if(keyboard[pyglet.window.key.A]):
-        rocket[0].body.apply_force_at_local_point((-100,0),(0,-rocket[0].height//2))
+        output[2] -= 1
+        #rocket[0].body.apply_force_at_local_point((-100,0),(0,-rocket[0].height//2))
     if(keyboard[pyglet.window.key.D]):
-        rocket[0].body.apply_force_at_local_point((100,0),(0,-rocket[0].height//2))
+        output[2] += 1
+        #rocket[0].body.apply_force_at_local_point((100,0),(0,-rocket[0].height//2))
+
+    rocket[0].propel(output)
 
     if ((rocket[0].body.position.y < -100) or 
             (rocket[0].body.position.y > window_height+100) or
@@ -76,11 +88,15 @@ def update(dt):
                 [BASE_MARGIN,window_height-BASE_MARGIN],
                 [window_width//2-NOT_BASE_MARGIN//2,window_width//2+NOT_BASE_MARGIN//2],
                 [window_height//2-NOT_BASE_MARGIN//2,window_height//2+NOT_BASE_MARGIN//2])
-        rocket.append(Rocket(x_pos = window.width//2, y_pos = window.height//2))
+        rocket.append(Rocket(x_pos = window.width//2, y_pos = window.height//2,lateral_force = 300,batch=batch))
         rocket[-1].insert(space)
         rocket_image.attach(rocket[-1])
             
-    rocket_image.rocket_sprite.update(rocket[0].body.position.x, rocket[0].body.position.y, -float(rocket[0].body.angle) * 180 / 3.1416)
+#    rocket_image.rocket_sprite.update(rocket[0].body.position.x, rocket[0].body.position.y, -float(rocket[0].body.angle) * 180 / 3.1416)
+#    rocket_image.exhaust_sprite.update(rocket[0].body.position.x, rocket[0].body.position.y, -float(rocket[0].body.angle) * 180 / 3.1416)
+    rocket_image.attach(rocket[0])
+    rocket[0].update()
+    rocket[0].visibility(False)
 
     space.step(1/60)
 

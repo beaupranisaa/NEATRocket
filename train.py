@@ -31,6 +31,8 @@ window_height = window.height
 window.set_caption("NEATLanding")
 fps_display = pyglet.window.FPSDisplay(window=window)
 
+batch = pyglet.graphics.Batch()
+
 #create drawoptions object
 options = DrawOptions()
 
@@ -58,15 +60,16 @@ dead_rockets = []
 generation = 0
 best_fitness = -float('inf')
 
-rocket_image = RocketImage()
+rocket_image = RocketImage(batch=batch)
 
 #on_draw window event
 @window.event
 def on_draw():
     window.clear()
     space.debug_draw(options)
+    batch.draw()
     fps_display.draw()
-    rocket_image.rocket_sprite.draw()
+    #rocket_image.rocket_sprite.draw()
 
 @window.event
 def on_mouse_press(x,y,button,modifier):
@@ -123,9 +126,8 @@ def eval_genomes(genomes, config):
     for i, (genome_id, genome) in enumerate(genomes):
         genomess.append(genome)
         genomess[-1].fitness = 0
-        rockets.append(Rocket(x_pos = window.width//2, y_pos = window.height//2, lateral_force = 1000))
-        rockets[-1].shape.color = (random.randint(100,255), random.randint(100,255), random.randint(100,255), 100.0)
-        rockets[-1].shape.sensor = True
+        rockets.append(Rocket(x_pos = window.width//2, y_pos = window.height//2, lateral_force = 1000,batch=batch))
+        #rockets[-1].shape.sensor = True
 
         rockets[-1].insert(space)
 
@@ -160,8 +162,10 @@ def update(dt):
             current_best_fitness = genome.fitness
             current_best_fitness_idx = i
 
-    rocket_image.rocket_sprite.update(rockets[current_best_fitness_idx].body.position.x, rockets[current_best_fitness_idx].body.position.y, -float(rockets[current_best_fitness_idx].body.angle) * 180 / 3.1416)
+
     rocket_image.attach(rockets[current_best_fitness_idx])
+#    rocket_image.rocket_sprite.update(rockets[current_best_fitness_idx].body.position.x, rockets[current_best_fitness_idx].body.position.y, -float(rockets[current_best_fitness_idx].body.angle) * 180 / 3.1416)
+#    rocket_image.attach(rockets[current_best_fitness_idx])
     step_count += 1
 
     if(((step_count) >= 60*20) or (sum(dead_rockets) == 100)):
@@ -208,6 +212,11 @@ def update(dt):
 
         genomess[i].fitness = genomess[i].fitness - get_fitness2(states)
         rockets[i].propel(output)
+        rockets[i].update()
+        if i == current_best_fitness_idx:
+            rockets[i].visibility(False)
+        else:
+            rockets[i].visibility(True)
 
         if ((rockets[i].body.position.y < -100) or 
                 (rockets[i].body.position.y > window_height+100) or
