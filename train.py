@@ -168,11 +168,11 @@ def update(dt):
 #    rocket_image.attach(rockets[current_best_fitness_idx])
     step_count += 1
 
-    if(((step_count) >= 60*20) or (sum(dead_rockets) == 100)):
+    if(((step_count) >= 60*30) or (sum(dead_rockets) == 300)):
         best_fitness_idx = -1
         best_fitness = -float('inf')
         for i,genome in enumerate(genomess):
-            genome.fitness -= (60*20-step_count)*5
+            genome.fitness -= (60*30-step_count)*5
             if best_fitness < genome.fitness:
                 best_fitness = genome.fitness
                 best_fitness_idx = i
