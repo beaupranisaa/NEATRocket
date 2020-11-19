@@ -10,6 +10,7 @@ import random
 import pickle
 import glob
 import sys
+import math
 
 from rocket import Rocket, RocketImage
 from base import Base
@@ -112,6 +113,16 @@ def get_fitness2(states):
         s += state_weights*(abs(state))
     return s
 
+def get_fitness3(states):
+    state_weights = [1,1,1,0,0,0]
+    sigma = 10.0
+    s = 0
+    for i, (state,state_weights) in enumerate(zip(states,state_weights)):
+        s += state_weights*(abs(state))
+    s = -math.exp(-s/sigma)
+    return s
+
+
 def eval_genomes(genomes, config):
     #this function runs once a generation
     global genomess
@@ -126,7 +137,7 @@ def eval_genomes(genomes, config):
     for i, (genome_id, genome) in enumerate(genomes):
         genomess.append(genome)
         genomess[-1].fitness = 0
-        rockets.append(Rocket(x_pos = window.width//2, y_pos = window.height//2,batch=batch))
+        rockets.append(Rocket(x_pos = window.width//2, y_pos = window.height//2,batch=batch,_id=genome_id))
         #rockets[-1].shape.sensor = True
 
         rockets[-1].insert(space)
@@ -157,6 +168,7 @@ def update(dt):
             current_best_fitness = genome.fitness
             current_best_fitness_idx = i
 
+    #print(current_best_fitness)
 
     rocket_image.attach(rockets[current_best_fitness_idx])
 #    rocket_image.rocket_sprite.update(rockets[current_best_fitness_idx].body.position.x, rockets[current_best_fitness_idx].body.position.y, -float(rockets[current_best_fitness_idx].body.angle) * 180 / 3.1416)
@@ -167,7 +179,7 @@ def update(dt):
         best_fitness_idx = -1
         best_fitness = -float('inf')
         for i,genome in enumerate(genomess):
-            genome.fitness -= (60*30-step_count)*5
+            #genome.fitness -= (60*30-step_count)*5
             if best_fitness < genome.fitness:
                 best_fitness = genome.fitness
                 best_fitness_idx = i
@@ -205,7 +217,7 @@ def update(dt):
        # for value in output:
        #     output_fitness += value**2
 
-        genomess[i].fitness = genomess[i].fitness - get_fitness2(states)
+        genomess[i].fitness = genomess[i].fitness - get_fitness3(states)
         rockets[i].propel(output)
         rockets[i].update()
         if i == current_best_fitness_idx:

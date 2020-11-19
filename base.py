@@ -9,6 +9,7 @@ class Base:
         self.aspect_ratio = aspect_ratio
         self.diameter = int(self.height*self.aspect_ratio)
         self.shape = pymunk.Poly.create_box(self.body,size=(self.diameter,self.height))
+        self.shape.color = (255,255,255,255)
 
         # set base's position
         self.body.position = x_pos, y_pos

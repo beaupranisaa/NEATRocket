@@ -62,19 +62,19 @@ def update(dt):
 
     if(keyboard[pyglet.window.key.W] or keyboard[pyglet.window.key.UP]):
         output[0] += 1
-        #rocket[0].body.apply_force_at_local_point((0,1500),(0,-rocket[0].height//2))
     if(keyboard[pyglet.window.key.E] or keyboard[pyglet.window.key.RIGHT]):
         output[1] += 1
-        #rocket[0].body.apply_force_at_local_point((100,0),(0,rocket[0].height//2))
     if(keyboard[pyglet.window.key.Q] or keyboard[pyglet.window.key.LEFT]):
         output[1] -= 1
-        #rocket[0].body.apply_force_at_local_point((-100,0),(0,rocket[0].height//2))
     if(keyboard[pyglet.window.key.A]):
         output[2] -= 1
-        #rocket[0].body.apply_force_at_local_point((-100,0),(0,-rocket[0].height//2))
     if(keyboard[pyglet.window.key.D]):
         output[2] += 1
-        #rocket[0].body.apply_force_at_local_point((100,0),(0,-rocket[0].height//2))
+    if(keyboard[pyglet.window.key.SPACE]):
+        base.random_position([BASE_MARGIN,window_width-BASE_MARGIN],
+                [BASE_MARGIN,window_height-BASE_MARGIN],
+                [window_width//2-NOT_BASE_MARGIN//2,window_width//2+NOT_BASE_MARGIN//2],
+                [window_height//2-NOT_BASE_MARGIN//2,window_height//2+NOT_BASE_MARGIN//2])
 
     rocket[0].propel(output)
 

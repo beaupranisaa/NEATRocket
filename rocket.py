@@ -4,7 +4,7 @@ import pyglet
 import cv2
 
 class Rocket:
-    def __init__(self, mass = 1, height = 200, aspect_ratio = 0.115, friction = 0.3, elasticity = 0.2, x_pos= 0, y_pos = 0, longitudinal_force = 2500, lateral_force = 400, batch = None):
+    def __init__(self,batch, mass = 1, height = 200, aspect_ratio = 0.115, friction = 0.3, elasticity = 0.2, x_pos= 0, y_pos = 0, longitudinal_force = 2500, lateral_force = 400, _id = None):
         # set rocket's pysical properties
         self.mass = mass
         self.aspect_ratio = aspect_ratio
@@ -16,13 +16,16 @@ class Rocket:
         self.lower_lateral_force = 0.0
         self.longitudinal_force = 0.0
 
-        if batch:
-            self.shape = pyglet.shapes.Rectangle(0,0,self.diameter,self.height, batch = batch)
-            self.shape.anchor_position = (self.diameter//2,self.height//2)
-            self.shape.color = (random.randint(100,255),random.randint(100,255),random.randint(100,255))
-            self.shape.opacity = 200
-        else:
-            self.shape = pymunk.Poly.create_box(self.body,size=(self.diameter//3,int(self.height*0.9)))
+        self.shape = pyglet.shapes.Rectangle(0,0,self.diameter,self.height, batch = batch)
+        self.shape.anchor_position = (self.diameter//2,self.height//2)
+        self.shape.color = (random.randint(100,255),random.randint(100,255),random.randint(100,255))
+        self.shape.opacity = 100
+
+        self.label = pyglet.text.Label("",x=100,y=100,anchor_x='center',anchor_y = 'center',batch=batch)
+        if (_id):
+            self.label.text = str(_id)
+
+        self.label.opacity = 100
 
         self.friction = friction
         self.elasticity = elasticity
@@ -36,9 +39,15 @@ class Rocket:
         self.body.velocity = 0.0,0.0
         self.body.angular_velocity = random.uniform(-0.1,0.1)
 
-    def update(self):
+    def update(self,text = None):
         self.shape.position = (self.body.position.x, self.body.position.y)
         self.shape.rotation = -float(self.body.angle)*180/3.1416
+
+        self.label.x = self.body.position.x
+        self.label.y = self.body.position.y 
+
+        if text:
+            self.label.text  = str(text)
 
     def visibility(self,visible = True):
         self.shape.visible = visible
@@ -49,6 +58,8 @@ class Rocket:
 
     def remove(self,space):
         space.remove(self.body)
+        self.label.delete()
+        self.shape.delete()
 
     def propel(self, output):
         #output is a list of output states [longitudinal, upper lateral, lower lateral]
@@ -119,10 +130,10 @@ class RocketImage:
         else:
             self.exhaust_sprite.visible = False
 
-        if(rocket.upper_lateral_force > 10):
+        if(rocket.upper_lateral_force > 50):
             self.booster_left_sprite.visible = True
             self.booster_right_sprite.visible = False
-        elif(rocket.upper_lateral_force < -10):
+        elif(rocket.upper_lateral_force < -50):
             self.booster_right_sprite.visible = True
             self.booster_left_sprite.visible = False
         else:
