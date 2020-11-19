@@ -15,6 +15,7 @@ class Rocket:
         self.upper_lateral_force = 0.0
         self.lower_lateral_force = 0.0
         self.longitudinal_force = 0.0
+        self.id = _id
 
         self.shape = pyglet.shapes.Rectangle(0,0,self.diameter,self.height, batch = batch)
         self.shape.anchor_position = (self.diameter//2,self.height//2)
@@ -22,8 +23,8 @@ class Rocket:
         self.shape.opacity = 100
 
         self.label = pyglet.text.Label("",x=100,y=100,anchor_x='center',anchor_y = 'center',batch=batch)
-        if (_id):
-            self.label.text = str(_id)
+        if (self.id):
+            self.label.text = str(self.id)
 
         self.label.opacity = 100
 
@@ -123,7 +124,6 @@ class RocketImage:
         self.exhaust_sprite.opacity = opacity
         self.booster_left_sprite.opacity = opacity
         self.booster_right_sprite.opacity = opacity
-
 
         if(rocket.longitudinal_force > 10):
             self.exhaust_sprite.visible = True
