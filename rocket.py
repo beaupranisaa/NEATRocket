@@ -4,7 +4,7 @@ import pyglet
 import cv2
 
 class Rocket:
-    def __init__(self, mass = 1, height = 200, aspect_ratio = 0.115, friction = 0.3, elasticity = 0.2, x_pos= 0, y_pos = 0, longitudinal_force = 2500, lateral_force = 200, batch = None):
+    def __init__(self, mass = 1, height = 200, aspect_ratio = 0.115, friction = 0.3, elasticity = 0.2, x_pos= 0, y_pos = 0, longitudinal_force = 2500, lateral_force = 400, batch = None):
         # set rocket's pysical properties
         self.mass = mass
         self.aspect_ratio = aspect_ratio

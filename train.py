@@ -126,7 +126,7 @@ def eval_genomes(genomes, config):
     for i, (genome_id, genome) in enumerate(genomes):
         genomess.append(genome)
         genomess[-1].fitness = 0
-        rockets.append(Rocket(x_pos = window.width//2, y_pos = window.height//2, lateral_force = 1000,batch=batch))
+        rockets.append(Rocket(x_pos = window.width//2, y_pos = window.height//2,batch=batch))
         #rockets[-1].shape.sensor = True
 
         rockets[-1].insert(space)
@@ -138,11 +138,6 @@ def eval_genomes(genomes, config):
     pyglet.app.run()
 
     base.iterate_position(reset=True,window_width = window_width, window_height = window_height)
-
-#    base.random_position([BASE_MARGIN,window_width-BASE_MARGIN],
-#            [BASE_MARGIN,window_height-BASE_MARGIN],
-#            [window_width//2-NOT_BASE_MARGIN//2,window_width//2+NOT_BASE_MARGIN//2],
-#            [window_height//2-NOT_BASE_MARGIN//2,window_height//2+NOT_BASE_MARGIN//2])
 
 def update(dt):
     global nets
