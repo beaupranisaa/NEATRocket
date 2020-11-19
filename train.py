@@ -11,7 +11,7 @@ import pickle
 import glob
 import sys
 
-from rocket import Rocket
+from rocket import Rocket, RocketImage
 from base import Base
 
 if len(sys.argv) == 2:
@@ -24,8 +24,8 @@ else:
 #setup the window
 window_width = 1366
 window_height = 768
-window = pyglet.window.Window(window_width,window_height)
-#window = pyglet.window.Window(fullscreen = True)
+#window = pyglet.window.Window(window_width,window_height)
+window = pyglet.window.Window(fullscreen = True)
 window_width = window.width
 window_height = window.height
 window.set_caption("NEATLanding")
@@ -43,6 +43,7 @@ BASE_MARGIN = 100
 NOT_BASE_MARGIN = 500
 base = Base(x_pos = window_width//2,y_pos = window_height//2)
 base.insert(space)
+base.iterate_position(reset=True,window_width = window_width, window_height = window_height)
 
 #state scale
 CARTESIAN_SCALE = 200.0
@@ -57,12 +58,15 @@ dead_rockets = []
 generation = 0
 best_fitness = -float('inf')
 
+rocket_image = RocketImage()
+
 #on_draw window event
 @window.event
 def on_draw():
     window.clear()
     space.debug_draw(options)
     fps_display.draw()
+    rocket_image.rocket_sprite.draw()
 
 @window.event
 def on_mouse_press(x,y,button,modifier):
@@ -128,12 +132,15 @@ def eval_genomes(genomes, config):
         dead_rockets.append(0)
         nets.append(neat.nn.FeedForwardNetwork.create(genome, config))
 
+
     pyglet.app.run()
 
-    base.random_position([BASE_MARGIN,window_width-BASE_MARGIN],
-            [BASE_MARGIN,window_height-BASE_MARGIN],
-            [window_width//2-NOT_BASE_MARGIN//2,window_width//2+NOT_BASE_MARGIN//2],
-            [window_height//2-NOT_BASE_MARGIN//2,window_height//2+NOT_BASE_MARGIN//2])
+    base.iterate_position(reset=True,window_width = window_width, window_height = window_height)
+
+#    base.random_position([BASE_MARGIN,window_width-BASE_MARGIN],
+#            [BASE_MARGIN,window_height-BASE_MARGIN],
+#            [window_width//2-NOT_BASE_MARGIN//2,window_width//2+NOT_BASE_MARGIN//2],
+#            [window_height//2-NOT_BASE_MARGIN//2,window_height//2+NOT_BASE_MARGIN//2])
 
 def update(dt):
     global nets
@@ -144,6 +151,17 @@ def update(dt):
     global generation
     global best_fitness
 
+
+    current_best_fitness = -float('inf')
+    current_best_idx = -1
+
+    for i,genome in enumerate(genomess):
+        if current_best_fitness < genome.fitness:
+            current_best_fitness = genome.fitness
+            current_best_fitness_idx = i
+
+    rocket_image.rocket_sprite.update(rockets[current_best_fitness_idx].body.position.x, rockets[current_best_fitness_idx].body.position.y, -float(rockets[current_best_fitness_idx].body.angle) * 180 / 3.1416)
+    rocket_image.attach(rockets[current_best_fitness_idx])
     step_count += 1
 
     if(((step_count) >= 60*20) or (sum(dead_rockets) == 100)):
@@ -154,6 +172,8 @@ def update(dt):
             if best_fitness < genome.fitness:
                 best_fitness = genome.fitness
                 best_fitness_idx = i
+
+        print(best_fitness)
         
         if best_fitness_idx != -1:
             print("Saving Network")
@@ -170,10 +190,11 @@ def update(dt):
         rockets = []
 
     if((step_count % 300 == 0)):
-        base.random_position([BASE_MARGIN,window_width-BASE_MARGIN],
-                [BASE_MARGIN,window_height-BASE_MARGIN],
-                [window_width//2-NOT_BASE_MARGIN//2,window_width//2+NOT_BASE_MARGIN//2],
-                [window_height//2-NOT_BASE_MARGIN//2,window_height//2+NOT_BASE_MARGIN//2])
+        base.iterate_position(reset=False,window_width = window_width, window_height = window_height)
+#        base.random_position([BASE_MARGIN,window_width-BASE_MARGIN],
+#                [BASE_MARGIN,window_height-BASE_MARGIN],
+#                [window_width//2-NOT_BASE_MARGIN//2,window_width//2+NOT_BASE_MARGIN//2],
+#                [window_height//2-NOT_BASE_MARGIN//2,window_height//2+NOT_BASE_MARGIN//2])
 
     # apply force to every rocket
     for i, net in enumerate(nets):

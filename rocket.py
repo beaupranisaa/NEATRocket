@@ -1,5 +1,6 @@
 import pymunk
 import random
+import pyglet
 
 class Rocket:
     def __init__(self, mass = 1, height = 200, aspect_ratio = 0.12, friction = 0.3, elasticity = 0.2, x_pos= 0, y_pos = 0, longitudinal_force = 2500, lateral_force = 200):
@@ -44,3 +45,25 @@ class Rocket:
         self.body.apply_force_at_local_point((0,longitudinal_force),(0,-self.height//2))
         self.body.apply_force_at_local_point((lower_lateral_force,0),(0,-self.height//2)) 
         self.body.apply_force_at_local_point((upper_lateral_force,0),(0,self.height//2))
+
+
+class RocketImage:
+    def __init__(self):
+        self.rocket_img = pyglet.image.load("img/rocket2.png")  # .convert_alpha()
+        self.rocket_img.anchor_x =  380//2 #self.rocket_img.width//2
+        self.rocket_img.anchor_y =  480//2 #®self.rocket_img.height//2
+        self.rocket_height, self.rocket_width = 400,400
+        self.texture = self.rocket_img.get_texture()
+        self.texture.width = self.rocket_width
+        self.texture.height = self.rocket_height
+
+        self.rocket_sprite = pyglet.sprite.Sprite(self.rocket_img, x=0, y=0)
+
+    def attach(self,rocket):
+        self.rocket_sprite.update(rocket.body.position.x, rocket.body.position.y, -float(rocket.body.angle) * 180 / 3.1416)
+
+
+
+
+
+

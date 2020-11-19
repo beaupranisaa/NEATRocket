@@ -16,13 +16,30 @@ class Base:
         # set sensor = True to not handle collisions
         self.shape.sensor = True
 
+        self.index = 0
+
     def insert(self,space):
         # add base to space
         space.add(self.body,self.shape)
 
+    def iterate_position(self, reset = False, window_width = 1000, window_height = 500):
+        x_positions = [int(window_width*0.8), int(window_width*0.8), int(window_width*0.2), int(window_width*0.2)]
+        y_positions = [int(window_height*0.8), int(window_height*0.2), int(window_height*0.2), int(window_height*0.8)]
+        
+        if reset or (self.index >= len(x_positions)):
+            self.index = 0
+
+        x_pos = x_positions[self.index]
+        y_pos = y_positions[self.index]
+
+        self.move(x_pos, y_pos)
+
+        self.index += 1
+
+        return self.index
+
     def random_position(self, x_range, y_range, not_x_range = [0,0], not_y_range=[0,0]):
         # randomly position the base
-
         # not x and not y should be a smaller window than x and y ranges
         if not ((x_range[0] < not_x_range[0]) or 
                 (x_range[1] > not_x_range[1]) or

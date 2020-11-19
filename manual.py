@@ -5,7 +5,7 @@ import pymunk
 import pyglet
 from pymunk.pyglet_util import DrawOptions
 
-from rocket import Rocket
+from rocket import Rocket, RocketImage
 from base import Base
 
 #setup the window
@@ -13,6 +13,8 @@ window_width = 1366
 window_height = 768
 #window = pyglet.window.Window(window_width,window_height)
 window = pyglet.window.Window(fullscreen=True)
+window_width = window.width
+window_height = window.height
 window.set_caption("NEATLanding")
 fps_display = pyglet.window.FPSDisplay(window=window)
 
@@ -38,6 +40,9 @@ rocket = []
 rocket.append(Rocket(x_pos = window.width//2, y_pos = window.height//2))
 rocket[-1].insert(space)
 
+rocket_image = RocketImage()
+rocket_image.attach(rocket[-1])
+
 keyboard = pyglet.window.key.KeyStateHandler()
 window.push_handlers(keyboard)
 
@@ -47,10 +52,7 @@ def on_draw():
     window.clear()
     space.debug_draw(options)
     fps_display.draw()
-
-#@window.event
-#def on_mouse_press(x,y,button,modifier):
-#    pass
+    rocket_image.rocket_sprite.draw()
 
 def update(dt):
     if(keyboard[pyglet.window.key.W] or keyboard[pyglet.window.key.UP]):
@@ -76,7 +78,10 @@ def update(dt):
                 [window_height//2-NOT_BASE_MARGIN//2,window_height//2+NOT_BASE_MARGIN//2])
         rocket.append(Rocket(x_pos = window.width//2, y_pos = window.height//2))
         rocket[-1].insert(space)
+        rocket_image.attach(rocket[-1])
             
+    rocket_image.rocket_sprite.update(rocket[0].body.position.x, rocket[0].body.position.y, -float(rocket[0].body.angle) * 180 / 3.1416)
+
     space.step(1/60)
 
 #Set pyglet update interval

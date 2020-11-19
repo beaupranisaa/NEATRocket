@@ -12,7 +12,7 @@ import errno
 import glob
 import sys
 
-from rocket import Rocket
+from rocket import Rocket, RocketImage
 from base import Base
 
 if len(sys.argv) > 1:
@@ -49,6 +49,8 @@ base.random_position([BASE_MARGIN,window_width-BASE_MARGIN],
         [window_height//2-NOT_BASE_MARGIN//2,window_height//2+NOT_BASE_MARGIN//2])
 base.insert(space)
 
+rocket_images = []
+
 #state scale
 CARTESIAN_SCALE = 200.0
 ANGULAR_SCALE = 1.0/2.0
@@ -59,6 +61,8 @@ def on_draw():
     window.clear()
     space.debug_draw(options)
     fps_display.draw()
+    for rocket_image in rocket_images:
+        rocket_image.rocket_sprite.draw()
 
 @window.event
 def on_mouse_press(x,y,button,modifier):
@@ -106,6 +110,7 @@ def update(dt):
 
 
     for i, rocket in enumerate(rockets):
+        rocket_images[i].rocket_sprite.update(rocket.body.position.x, rocket.body.position.y, -float(rocket.body.angle) * 180 / 3.1416)
         states = get_states(rocket)
         output = nets[i].activate(states)
         
@@ -147,9 +152,12 @@ def run():
         nets.append(pickle.load( open(path, "rb" )))
 
         rockets.append(Rocket(x_pos = window.width//2, y_pos = window.height//2))
+        rocket_images.append(RocketImage())
+
         rockets[-1].shape.color = (random.randint(0,255), random.randint(0,255), random.randint(0,255), 255)
         rockets[-1].shape.sensor = True
         rockets[-1].insert(space)
+        rocket_images[-1].attach(rockets[-1])
 
     pyglet.app.run()
 
