@@ -100,7 +100,7 @@ def get_states(rocket):
     return [ex,ey,ea,evx,evy,eva]
 
 def get_fitness(states):
-    state_weights = [1,1,1,0,0,0]
+    state_weights = [1,1,0,0,0,0]
     s = 0
     for i, (state,state_weights) in enumerate(zip(states,state_weights)):
         s += state_weights*(state**2)
@@ -122,6 +122,13 @@ def get_fitness3(states):
     s = -math.exp(-s/sigma)
     return s
 
+def get_fitness4(states):
+    state_weights = [1,1,0,0,0,0]
+    intercept = 1.0
+    s = 0
+    for i, (state,state_weights) in enumerate(zip(states,state_weights)):
+        s += state_weights*(max(-abs(state) + intercept,0.0))
+    return -s
 
 def eval_genomes(genomes, config):
     #this function runs once a generation
@@ -175,11 +182,11 @@ def update(dt):
 #    rocket_image.attach(rockets[current_best_fitness_idx])
     step_count += 1
 
-    if(((step_count) >= 60*30) or (sum(dead_rockets) == 300)):
+    if(((step_count) >= 60*30) or (sum(dead_rockets) >= 0.95*300)):
         best_fitness_idx = -1
         best_fitness = -float('inf')
         for i,genome in enumerate(genomess):
-            #genome.fitness -= (60*30-step_count)*5
+            genome.fitness -= (60*30-step_count)*5
             if best_fitness < genome.fitness:
                 best_fitness = genome.fitness
                 best_fitness_idx = i
@@ -217,7 +224,7 @@ def update(dt):
        # for value in output:
        #     output_fitness += value**2
 
-        genomess[i].fitness = genomess[i].fitness - get_fitness3(states)
+        genomess[i].fitness = genomess[i].fitness - get_fitness2(states)
         rockets[i].propel(output)
         rockets[i].update()
         if i == current_best_fitness_idx:

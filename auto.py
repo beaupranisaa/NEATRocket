@@ -35,6 +35,9 @@ fps_display = pyglet.window.FPSDisplay(window=window)
 
 batch = pyglet.graphics.Batch()
 
+keyboard = pyglet.window.key.KeyStateHandler()
+window.push_handlers(keyboard)
+
 #create drawoptions object
 options = DrawOptions()
 
@@ -110,6 +113,12 @@ def update(dt):
 #                [window_width//2-NOT_BASE_MARGIN//2,window_width//2+NOT_BASE_MARGIN//2],
 #                [window_height//2-NOT_BASE_MARGIN//2,window_height//2+NOT_BASE_MARGIN//2])
 
+
+    if(keyboard[pyglet.window.key.SPACE]):
+        base.random_position([BASE_MARGIN,window_width-BASE_MARGIN],
+                [BASE_MARGIN,window_height-BASE_MARGIN],
+                [window_width//2-NOT_BASE_MARGIN//2,window_width//2+NOT_BASE_MARGIN//2],
+                [window_height//2-NOT_BASE_MARGIN//2,window_height//2+NOT_BASE_MARGIN//2])
 
     for i, rocket in enumerate(rockets):
         rocket_images[i].attach(rocket)

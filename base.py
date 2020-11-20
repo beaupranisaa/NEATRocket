@@ -24,8 +24,8 @@ class Base:
         space.add(self.body,self.shape)
 
     def iterate_position(self, reset = False, window_width = 1000, window_height = 500):
-        x_positions = [int(window_width*0.8), int(window_width*0.8), int(window_width*0.2), int(window_width*0.2),int(window_width*0.8),int(window_width*0.2)]
-        y_positions = [int(window_height*0.8), int(window_height*0.2), int(window_height*0.2), int(window_height*0.8),int(window_height*0.2),int(window_height*0.8)]
+        x_positions = [int(window_width*0.9), int(window_width*0.9), int(window_width*0.1), int(window_width*0.1),int(window_width*0.9),int(window_width*0.1)]
+        y_positions = [int(window_height*0.9), int(window_height*0.1), int(window_height*0.1), int(window_height*0.9),int(window_height*0.1),int(window_height*0.9)]
         
         if reset or (self.index >= len(x_positions)):
             self.index = 0

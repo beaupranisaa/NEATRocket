@@ -97,6 +97,13 @@ class RocketImage:
         self.booster_right_img.anchor_x =  self.booster_right_img.width//2 - self.rocket_img.height//2 + 10
         self.booster_right_img.anchor_y =  self.booster_right_img.height//2 + 70
 
+        self.booster2_left_img = pyglet.image.load("img/exhaust_flame_resized_2.png")
+        self.booster2_left_img.anchor_x =  self.booster2_left_img.width//2 + self.rocket_img.height//2 - 10
+        self.booster2_left_img.anchor_y =  self.booster2_left_img.height//2 + 70
+
+        self.booster2_right_img = pyglet.image.load("img/exhaust_flame_resized_2.png")
+        self.booster2_right_img.anchor_x =  self.booster2_right_img.width//2 - self.rocket_img.height//2 + 10
+        self.booster2_right_img.anchor_y =  self.booster2_right_img.height//2 + 70
 #        self.rocket_height, self.rocket_width = 5414,414
 #        self.texture = self.rocket_img.get_texture()
 #        self.texture.width = self.rocket_width
@@ -107,11 +114,15 @@ class RocketImage:
             self.exhaust_sprite = pyglet.sprite.Sprite(self.exhaust_img, x=0, y=0, batch = batch)
             self.booster_left_sprite = pyglet.sprite.Sprite(self.booster_left_img, x=0, y=0, batch = batch)
             self.booster_right_sprite = pyglet.sprite.Sprite(self.booster_right_img, x=0, y=0, batch = batch)
+            self.booster2_left_sprite = pyglet.sprite.Sprite(self.booster2_left_img, x=0, y=0, batch = batch)
+            self.booster2_right_sprite = pyglet.sprite.Sprite(self.booster2_right_img, x=0, y=0, batch = batch)
         else:
             self.rocket_sprite = pyglet.sprite.Sprite(self.rocket_img, x=0, y=0)
             self.exhaust_sprite = pyglet.sprite.Sprite(self.exhaust_img, x=0, y=0)
             self.booster_left_sprite = pyglet.sprite.Sprite(self.booster_left_img, x=0, y=0)
             self.booster_right_sprite = pyglet.sprite.Sprite(self.booster_right_img, x=0, y=0)
+            self.booster2_left_sprite = pyglet.sprite.Sprite(self.booster_left_img, x=0, y=0)
+            self.booster2_right_sprite = pyglet.sprite.Sprite(self.booster_right_img, x=0, y=0)
 
     def attach(self,rocket):
         opacity = random.randint(100,255)
@@ -120,6 +131,9 @@ class RocketImage:
         self.exhaust_sprite.update(rocket.body.position.x, rocket.body.position.y, -float(rocket.body.angle) * 180 / 3.1416)
         self.booster_left_sprite.update(rocket.body.position.x, rocket.body.position.y, 90-float(rocket.body.angle) * 180 / 3.1416)
         self.booster_right_sprite.update(rocket.body.position.x, rocket.body.position.y, -90-float(rocket.body.angle) * 180 / 3.1416)
+
+        self.booster2_left_sprite.update(rocket.body.position.x, rocket.body.position.y, -90-float(rocket.body.angle) * 180 / 3.1416)
+        self.booster2_right_sprite.update(rocket.body.position.x, rocket.body.position.y, 90-float(rocket.body.angle) * 180 / 3.1416)
 
         self.exhaust_sprite.opacity = opacity
         self.booster_left_sprite.opacity = opacity
@@ -140,8 +154,15 @@ class RocketImage:
             self.booster_right_sprite.visible = False
             self.booster_left_sprite.visible = False
 
-
-
+        if(rocket.lower_lateral_force < -50):
+            self.booster2_left_sprite.visible = True
+            self.booster2_right_sprite.visible = False
+        elif(rocket.lower_lateral_force > 50):
+            self.booster2_right_sprite.visible = True
+            self.booster2_left_sprite.visible = False
+        else:
+            self.booster2_right_sprite.visible = False
+            self.booster2_left_sprite.visible = False
 
 
 
