@@ -56,11 +56,11 @@ $ bash clear.sh
 
 ### Todo:
 
-[ ] Add text and visualizations (best genome is a space shuttle, list of fitness, generation number, identification for each genome)
-[x] Find better fitness functions
-[x] Read the paper again.
-[x] Optimize config file
-[ ] Record and make presentation
+- [ ] Add text and visualizations (best genome is a space shuttle, list of fitness, generation number, identification for each genome)
+- [x] Find better fitness functions
+- [x] Read the paper again.
+- [x] Optimize config file
+- [ ] Record and make presentation
     - find interesting points
 
 
