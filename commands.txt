@@ -1,0 +1,9 @@
+manually playing the game
+./manual.py
+
+training the network
+./train.py
+
+running the trained network
+./auto.py networks_final_2/Net_50* networks_final_3/Net_50*
+

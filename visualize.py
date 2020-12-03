@@ -15,7 +15,7 @@ def plot_stats(statistics, ylog=False, view=False, filename='avg_fitness.svg'):
         return
 
     # generation = range(len(statistics.rockets[current_best_fitness_idx]))
-    generation = range(len(statistics.most_fit_genomes))
+    generation = range(1,len(statistics.most_fit_genomes)+1)
     best_fitness = [c.fitness for c in statistics.most_fit_genomes]
     avg_fitness = np.array(statistics.get_fitness_mean())
     stdev_fitness = np.array(statistics.get_fitness_stdev())
@@ -25,7 +25,7 @@ def plot_stats(statistics, ylog=False, view=False, filename='avg_fitness.svg'):
     # plt.plot(generation, avg_fitness + stdev_fitness, 'g-.', label="+1 sd")
     plt.plot(generation, best_fitness, 'r-', label="best")
 
-    plt.title("Population's average and best fitness")
+    plt.title("Population's best fitness")
     plt.xlabel("Generations")
     plt.ylabel("Fitness")
     plt.grid()
