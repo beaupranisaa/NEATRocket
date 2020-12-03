@@ -11,6 +11,8 @@ import pickle
 import glob
 import sys
 import math
+import visualize
+import graphviz
 
 from rocket import Rocket, RocketImage
 from base import Base
@@ -23,10 +25,10 @@ else:
     NETWORK_DIR = 'networksTest/'
 
 #setup the window
-window_width = 1366
-window_height = 768
-#window = pyglet.window.Window(window_width,window_height)
-window = pyglet.window.Window(fullscreen = True)
+window_width = 1920
+window_height = 1080
+window = pyglet.window.Window(window_width,window_height)
+#window = pyglet.window.Window(fullscreen = True)
 window_width = window.width
 window_height = window.height
 window.set_caption("NEATLanding")
@@ -58,8 +60,15 @@ nets = []
 rockets = []
 step_count = 0
 dead_rockets = []
-generation = 0
+generation = 1
 best_fitness = -float('inf')
+GENERATIONS = 50
+
+generation_number = pyglet.text.Label('',
+                          font_name='Arial',
+                          font_size=15,
+                          x = 100, y=window_height-30,
+                          anchor_x='center', anchor_y='center',batch=batch)
 
 rocket_image = RocketImage(batch=batch)
 
@@ -143,15 +152,16 @@ def eval_genomes(genomes, config):
 
     for i, (genome_id, genome) in enumerate(genomes):
         genomess.append(genome)
+        current_fitness = genome.fitness
         genomess[-1].fitness = 0
-        rockets.append(Rocket(x_pos = window.width//2, y_pos = window.height//2,batch=batch,_id=genome_id))
-        #rockets[-1].shape.sensor = True
+        rockets.append(Rocket(x_pos = window.width//2, y_pos = window.height//2,batch=batch,_id=current_fitness))
 
         rockets[-1].insert(space)
 
         dead_rockets.append(0)
         nets.append(neat.nn.FeedForwardNetwork.create(genome, config))
 
+    generation_number.text = f"Generation: {generation}"
 
     pyglet.app.run()
 
@@ -165,7 +175,6 @@ def update(dt):
     global dead_rockets
     global generation
     global best_fitness
-
 
     current_best_fitness = -float('inf')
     current_best_idx = -1
@@ -257,11 +266,17 @@ def run(config_file):
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
 
-    # Run for up to 3000 generations.
-    winner = p.run(eval_genomes, 3000)
+    node_names = {-1: 'x', -2:'y', -3:'angle', -4:'xdot', -5:'ydot', -6:'angledot',0:'Main Jet',1:'Upper Jet',2:'Lower Jet'}
 
-    # Display the winning genome.
-    print('\nBest genome:\n{!s}'.format(winner))
+    for gen in range(1,GENERATIONS+1):
+        winner = p.run(eval_genomes, 1)
+
+        # Display the winning genome.
+        print('\nBest genome:\n{!s}'.format(winner))
+
+        visualize.draw_net(config, winner, node_names=node_names,view=False,filename=f"{NETWORK_DIR}diagraph_{gen}",fmt='png')
+        visualize.plot_stats(stats, ylog=False, view=False,filename=f"{NETWORK_DIR}fitness_{gen}.png")
+        visualize.plot_species(stats, view=False,filename=f"{NETWORK_DIR}speciation_{gen}.png")
 
 #Set pyglet update interval
 pyglet.clock.schedule(update)
