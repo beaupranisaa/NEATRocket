@@ -5,5 +5,12 @@ training the network
 ./train.py
 
 running the trained network
-./auto.py networks_final_2/Net_50* networks_final_3/Net_50*
 
+2 dof
+./auto.py networks_final_2/Net_[2-9]0*
+
+3 dof
+./auto.py networks_final_3/Net_[2-9]0*
+
+both
+./auto.py networks_final_2/Net_[2-9]0* networks_final_3/Net_[2-9]0*

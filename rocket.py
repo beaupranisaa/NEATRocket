@@ -24,7 +24,7 @@ class Rocket:
 
         self.label = pyglet.text.Label("",x=100,y=100,anchor_x='center',anchor_y = 'center',batch=batch)
         if (self.id):
-            self.label.text = str(round(self.id,2))
+            self.label.text = str(self.id)
 
         self.label.opacity = 100
 

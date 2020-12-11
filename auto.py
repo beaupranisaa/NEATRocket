@@ -18,10 +18,16 @@ from base import Base
 if len(sys.argv) > 1:
     NETWORK_PATH = [str(path) for i,path in enumerate(sys.argv) if i > 0]
 else:
-    default_path = glob.glob('networksTest/*')
+    default_path = glob.glob('networksTest/Net_*')
     NETWORK_PATH = default_path
 
 print("Networks:",NETWORK_PATH)
+
+net_id = []
+for net in NETWORK_PATH:
+    net_str = net.split('_')[-1]
+    net_str = net_str.split('.')[0]
+    net_id.append(net_str)
 
 #setup the window
 window_width = 1366
@@ -154,7 +160,7 @@ def run():
     global nets
     global rockets
 
-    for path in NETWORK_PATH:
+    for i,path in enumerate(NETWORK_PATH):
         if not os.path.exists(os.path.dirname(path)):
             raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), path)
 
@@ -163,7 +169,7 @@ def run():
 
         nets.append(pickle.load( open(path, "rb" )))
 
-        rockets.append(Rocket(x_pos = window.width//2, y_pos = window.height//2,batch=batch))
+        rockets.append(Rocket(x_pos = window.width//2, y_pos = window.height//2,batch=batch,_id = f"            {net_id[i]}"))
         rocket_images.append(RocketImage(batch=batch))
 
         rockets[-1].insert(space)

@@ -153,8 +153,10 @@ def eval_genomes(genomes, config):
     for i, (genome_id, genome) in enumerate(genomes):
         genomess.append(genome)
         current_fitness = genome.fitness
+        if current_fitness is None:
+            current_fitness = -float('inf')
         genomess[-1].fitness = 0
-        rockets.append(Rocket(x_pos = window.width//2, y_pos = window.height//2,batch=batch,_id=current_fitness))
+        rockets.append(Rocket(x_pos = window.width//2, y_pos = window.height//2,batch=batch,_id=round(current_fitness,1)))
 
         rockets[-1].insert(space)
 
