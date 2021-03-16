@@ -7,5 +7,5 @@
 *Networks*/
 *report*
 *commands*
-*pycache*
+__pycache__/*
 img/NEATRocketVideo.mp4
