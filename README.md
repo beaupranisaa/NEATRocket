@@ -1,5 +1,6 @@
 # NEATRocket
 
+![gif](https://github.com/ruke1ire/NEATRocket/blob/main/img/NEATRocketGif.gif "Thanos Snapper")
 Training a rocket controller using the NEAT algorithm.
 
 ### Dependencies:
@@ -54,18 +55,9 @@ $ bash clear.sh
     - bottom lateral propulsion states: clamped [-1,+1]
 - **fitness function** : Summation of weighted squared errors of the positional states across time
 
-### Todo:
+### Contributors:
 
-- [ ] Add text and visualizations (best genome is a space shuttle, list of fitness, generation number, identification for each genome)
-- [x] Find better fitness functions
-- [x] Read the paper again.
-- [x] Optimize config file
-- [ ] Record and make presentation
-    - find interesting points
-
-
-
-
-
-
+- Rom Parnichkun
+- Pranisaa Charnparttaravanit
+- Sitiporn Sae Lim
 

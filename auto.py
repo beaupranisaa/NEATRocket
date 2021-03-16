@@ -179,5 +179,5 @@ def run():
     pyglet.app.run()
 
 #Set pyglet update interval
-pyglet.clock.schedule(update)
+pyglet.clock.schedule_interval(update,1/60)
 run()
